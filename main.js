@@ -4,6 +4,7 @@ const Discord = require('discord.js')
 const client = new Discord.Client()
 const fs = require("fs"); // filesystem
 let login = JSON.parse(fs.readFileSync('auth.json')).token;
+const dir = './directory';
 
 
 
@@ -73,7 +74,7 @@ client.on('message', function (message){
 						})
 						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
 						//console.log(chosenPhotoNumber);
-						if (numPhotos != 0)
+						//if (numPhotos != 0)
 							message.channel.send({files: [`Name/Nishant/${chosenPhotoNumber}.PNG`]});
 						break;
 
@@ -81,10 +82,10 @@ client.on('message', function (message){
 
 						fs.readdir("Name/Vincent", (err, files) => {
 							numPhotos = files.length;
-						})
+						});
 						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
 						//console.log(chosenPhotoNumber);
-						if (numPhotos != 0)
+						//if (numPhotos != 0)
 							message.channel.send({files: [`Name/Vincent/${chosenPhotoNumber}.PNG`]});
 						break;
 
@@ -95,7 +96,8 @@ client.on('message', function (message){
 						})
 						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
 						//console.log(chosenPhotoNumber);
-						if (numPhotos != 0)
+						//console.log(numPhotos);
+						//if (numPhotos != 0)
 							message.channel.send({files: [`Name/Chris/${chosenPhotoNumber}.jpeg`]});
 						break;
 
