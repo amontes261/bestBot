@@ -96,7 +96,7 @@ client.on('message', function (message){
 						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
 						//console.log(chosenPhotoNumber);
 						if (numPhotos != 0)
-							message.channel.send({files: [`Name/Vincent/${chosenPhotoNumber}.jpeg`]});
+							message.channel.send({files: [`Name/Chris/${chosenPhotoNumber}.jpeg`]});
 						break;
 
 					case "dayssince":
