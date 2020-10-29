@@ -71,9 +71,10 @@ client.on('message', function (message){
 						fs.readdir("Name/Nishant", (err, files) => {
 							numPhotos = files.length;
 						})
-						chosenPhotoNumber = Math.floor((Math.random() * numPhotos) + 1); //Choose a number between 1 and numPhotos
-						console.log(chosenPhotoNumber);
-						message.channel.send({files: [`Name/Nishant/${chosenPhotoNumber}.PNG`]});
+						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
+						//console.log(chosenPhotoNumber);
+						if (numPhotos != 0)
+							message.channel.send({files: [`Name/Nishant/${chosenPhotoNumber}.PNG`]});
 						break;
 
 					case "Vincent":
@@ -81,9 +82,21 @@ client.on('message', function (message){
 						fs.readdir("Name/Vincent", (err, files) => {
 							numPhotos = files.length;
 						})
-						chosenPhotoNumber = Math.floor((Math.random() * numPhotos) + 1); //Choose a number between 1 and numPhotos
+						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
 						//console.log(chosenPhotoNumber);
-						message.channel.send({files: [`Name/Vincent/${chosenPhotoNumber}.PNG`]});
+						if (numPhotos != 0)
+							message.channel.send({files: [`Name/Vincent/${chosenPhotoNumber}.PNG`]});
+						break;
+
+					case "Chris":
+
+						fs.readdir("Name/Chris", (err, files) => {
+							numPhotos = files.length;
+						})
+						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
+						//console.log(chosenPhotoNumber);
+						if (numPhotos != 0)
+							message.channel.send({files: [`Name/Vincent/${chosenPhotoNumber}.jpeg`]});
 						break;
 
 					case "dayssince":
