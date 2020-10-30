@@ -16,11 +16,12 @@ client.on('ready', () => {
 	client.guilds.cache.forEach((guild) => {
 		console.log("Running on: " + guild.name)
 
-		/*
+		
 		guild.channels.cache.forEach((channel) => {
 			console.log(` - ${channel.name} ${channel.type} ${channel.id}`)
 		})
-		*/
+		
+		
 	})
 	
 
@@ -33,7 +34,8 @@ client.on('ready', () => {
 
 })
 
-client.on('message', function (message){
+client.on('message', async message => {
+	// console.log(message.member.voice);
 	if (message.author.bot) return;
 	/*
 	var msgSplit = message.split(" ");
@@ -60,45 +62,72 @@ client.on('message', function (message){
 			}
 			else{
 				const fs = require("fs"); // filesystem
-				var numPhotos = 0; // scope number of photos for each person
+				//var numPhotos = 0; // scope number of photos for each person
 				var chosenPhotoNumber = 0; // number of the selected photo
 				switch(String(msgSplit[1])){
 					case "help":
 						help(message.channel);
 						break;
+					
+					case "depression":
+						var vcID = 769972737099169792;
+						if (message.member.voice.channelID == null)
+							message.channel.send(`${message.author} you must join a voice channel first.`);
+						else{
+							var quadID = 758827953781080125;
+							var hasQuadRole = false;
+							message.member.roles.cache.forEach((role) => {
+								if (role.toString().substring(3, role.toString().length - 1) == quadID)
+									hasQuadRole = true;
+							})
+
+							if (hasQuadRole){
+
+								message.guild.member(message.author.id).voice.setChannel("769972737099169792");
+								if (message.author.id == "114081086065213443"){
+									message.channel.send(`Ok ${message.author}, its depression time. Got a special song picked out, just for you...`);
+								}
+								else{
+									message.channel.send(`Ok ${message.author}, its depression time.`);
+								}
+								
+								if (message.member.voice.channel) {
+									const connection = await client.channels.cache.get("769972737099169792").join();
+
+									if (message.author.id == "114081086065213443")
+										var dispatcher = connection.play('Depresso/cant_help_20M.mp3');
+									else{
+										var dispatcher = connection.play('Depresso/robbery.mp3');
+									}
+
+									dispatcher.on('finish', () => {
+										msg.member.voice.channel.leave();
+									});
+
+									dispatcher.on('error', console.error);
+								}
+							}
+							else{
+								message.channel.send(`${message.author} you're not authorized to run this command. You must have the \"quad\" role.`)
+							}
+						}
+						
+						break;
 
 					case "Nishant":
-						
-						fs.readdir("Name/Nishant", (err, files) => {
-							numPhotos = files.length;
-						})
-						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
-						//console.log(chosenPhotoNumber);
-						//if (numPhotos != 0)
-							message.channel.send({files: [`Name/Nishant/${chosenPhotoNumber}.PNG`]});
+						showRandPic("Nishant", fs, message);
 						break;
 
 					case "Vincent":
-
-						fs.readdir("Name/Vincent", (err, files) => {
-							numPhotos = files.length;
-						});
-						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
-						//console.log(chosenPhotoNumber);
-						//if (numPhotos != 0)
-							message.channel.send({files: [`Name/Vincent/${chosenPhotoNumber}.PNG`]});
+						showRandPic("Vincent", fs, message);
 						break;
 
 					case "Chris":
-
-						fs.readdir("Name/Chris", (err, files) => {
-							numPhotos = files.length;
-						})
-						chosenPhotoNumber = parseInt( ((Math.random() * numPhotos) + 1) , 10); //Choose a number between 1 and numPhotos
-						//console.log(chosenPhotoNumber);
-						//console.log(numPhotos);
-						//if (numPhotos != 0)
-							message.channel.send({files: [`Name/Chris/${chosenPhotoNumber}.jpeg`]});
+						showRandPic("Chris", fs, message);
+						break;
+					
+					case "Alex":
+						showRandPic("Alex", fs, message);
 						break;
 
 					case "dayssince":
@@ -136,17 +165,59 @@ client.on('message', function (message){
 					case "clip":
 						if (msgSplit.length == 2)
 							message.channel.send("Usage: Play a clip:```!bitch clip <clip name>```\nUpload a clip: ```!bitch clip upload <clip name>```\nList all available clips that can be sent: ```!bitch clip list```")
+						else if (msgSplit.length >= 3){
+							if (msgSplit.length == 3 && msgSplit[2] == "list"){
+								message.channel.send("Here's a list of the available clips:");
+
+								fs.readdir(`Clips/`, (err, files) => {
+									if (err)
+										message.channel.send(`An unexpected error has occurred... (Tagging <@${403355889253220352}> to get his attention)`);
+									else{
+										var pasteMsg = "";
+										files.forEach(file => {
+											if (file[0] != "."){
+												pasteMsg += file.substring(0, file.length - 4);
+												pasteMsg += "\n";
+											}
+										});
+
+										message.channel.send(pasteMsg);
+										message.channel.send("\n\nTo play a clip, try \"!bitch clip <clip name>\"");
+
+									}
+								});
+
+							}
+							else if (msgSplit.length == 3 && msgSplit[2] == "upload"){
+								message.channel.send("This command isn't supported yet. Coming soon.");
+							}
+							else if (msgSplit.length == 3){
+								fs.readdir(`Clips/`, (err, files) => {
+									if (err)
+										message.channel.send(`An unexpected error has occurred... (Tagging <@${403355889253220352}> to get his attention)`);
+									else{
+										var exists = false;
+										files.forEach(file => {
+											if (msgSplit[2] == file.substring(0, file.length - 4)){
+												exists = true;
+											}
+										});
+										if (exists){
+											message.react("▶️");
+											playAudioClip(msgSplit[2], message);
+										}
+										else{
+											message.channel.send(`Hmm... Looks like there are no clips with the name "${msgSplit[2]}". Try again with a different clip or upload one.`);
+										}
+									}
+								});
+							}
+							else{
+								message.channel.send("There was a problem with the 3rd argument entered. Please try again");
+							}
+						}
 						else{
-							/*
-							var voiceChannel = message.member.voice.channel;
-							voiceChannel.join().then(connection =>
-							{
-							   const dispatcher = connection.playFile('Clips/bitch_chris.mp3');
-							   dispatcher.on("end", end => {
-								 voiceChannel.leave();
-								 });
-							 }).catch(err => console.log(err));
-							 */
+							message.channel.send("There was a problem with the arguments you entered. Please try again");
 						}
 						break;
 				} // switch end
@@ -156,25 +227,7 @@ client.on('message', function (message){
 			//client.channels.cache.get(channelID).send("Pong");
 			//console.log("message")
 
-
-
-
-			// porn sounds
 		}
-		/*
-		client.uploadFile({
-		to: botMgmt,
-		file: "nishGay/1.PNG"
-	
-	
-	})
-	*/
-
-
-	
-
-
-
 })
 
 function help(channel){
@@ -182,30 +235,27 @@ function help(channel){
 	```bitch [NAME]``` - Sends a random, gay photo of the person");
 }
 
+function showRandPic(name, fs, msg){
+	fs.readdir(`Name/${name}`, (err, files) => { 
+		if (err)
+			msg.channel.send(`There was a problem loading ${name}'s pictures.`);
+		else{
+			if (files.length == 0)
+				msg.channel.send(`There don't seem to be any pictures for ${name}.`);
+			else{
+				chosenPhotoNumber = parseInt( ((Math.random() * files.length)) , 10); //Choose a number between 1 and numPhotos
+				msg.channel.send({files: [`Name/${name}/${chosenPhotoNumber}.jpeg`]});
+			}
+		}
+	});
+}
 
 
 function daysSince(who, indicator, fs, msg){
 	let data = JSON.parse(fs.readFileSync("dayssince.json"));
 	var userExists = false;
 	var date;
-	// console.log(data);
 
-	// var temp = "403355889253220351";
-
-	/*
-	console.log(data[who]);
-	var prevDate = new Date(data[who].date);
-
-	var today = new Date();
-	var todayString = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear();
-	var todaysDate = new Date(todayString);
-
-	var Difference_In_Time = todaysDate.getTime() - prevDate.getTime(); 
-	var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24); 
-
-	//console.log(Object.keys(dictionary));
-	//console.log(Difference_In_Days);
-	*/
 	Object.keys(data).forEach(function(key){
 		if (who == key)
 			userExists = true;
@@ -262,5 +312,25 @@ function daysSince(who, indicator, fs, msg){
 	}
 }
 
+async function playAudioClip(clipName, msg){
+	if (msg.member.voice.channel) {
+		const connection = await msg.member.voice.channel.join();
+	
+		const dispatcher = connection.play(`Clips/${clipName}.mp3`);
+		
+		/*
+		dispatcher.on('start', () => {
+			console.log('audio.mp3 is now playing!');
+		});
+		*/
+
+		dispatcher.on('finish', () => {
+			msg.member.voice.channel.leave();
+		});
+
+		// Always remember to handle errors appropriately!
+		dispatcher.on('error', console.error);
+	}
+}
 
 client.login(login);

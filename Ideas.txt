@@ -1,1 +1,17 @@
 - Birthdays (list birthday and days until)
+- Google "This" and then provide link
+- Poll (Vote)
+- Server Management
+    - Ban, Mute, etc.
+    - Review features of Mee6 Bot and implement those
+- Flip a coin
+- Music Bot?
+- Join and Play Clips
+- To-do list
+    -Asynchronous and synchronous
+- Porn sounds
+- Is <Person> gay
+    - Declare person as gay
+- Depression time
+    - Drag person into depression corner and start playing sad music
+-Discord Tinder
