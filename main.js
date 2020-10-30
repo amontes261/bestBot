@@ -34,7 +34,7 @@ client.on('ready', () => {
 
 })
 
-client.on('message', async message => {
+client.on('message', function (message) {
 	// console.log(message.member.voice);
 	if (message.author.bot) return;
 	/*
@@ -219,7 +219,7 @@ client.on('message', async message => {
 						else{
 							message.channel.send("There was a problem with the arguments you entered. Please try again");
 						}
-						break;
+					break;
 				} // switch end
 
 
@@ -243,7 +243,7 @@ function showRandPic(name, fs, msg){
 			if (files.length == 0)
 				msg.channel.send(`There don't seem to be any pictures for ${name}.`);
 			else{
-				chosenPhotoNumber = parseInt( ((Math.random() * files.length)) , 10); //Choose a number between 1 and numPhotos
+				chosenPhotoNumber = parseInt( ((Math.random() * files.length)) + 1 , 10); //Choose a number between 1 and numPhotos
 				msg.channel.send({files: [`Name/${name}/${chosenPhotoNumber}.jpeg`]});
 			}
 		}
