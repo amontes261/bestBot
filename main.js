@@ -34,7 +34,7 @@ client.on('ready', () => {
 
 })
 
-client.on('message', function (message) {
+client.on('message', async message => {
 	// console.log(message.member.voice);
 	if (message.author.bot) return;
 	/*
