@@ -3,15 +3,22 @@
 - Poll (Vote)
 - Server Management
     - Ban, Mute, etc.
-    - Review features of Mee6 Bot and implement those
-- Flip a coin
+    ✅  Review features of Mee6 Bot and implement those
+✅ Flip a coin
 - Music Bot?
 - Join and Play Clips
 - To-do list
     -Asynchronous and synchronous
 - Porn sounds
-- Is <Person> gay
-    - Declare person as gay
-- Depression time
-    - Drag person into depression corner and start playing sad music
--Discord Tinder
+✅  Is <Person> gay
+    ✅ Declare person as gay
+✅ Depression time
+    ✅ Drag person into depression corner and start playing sad music
+    - Add more music to depression folder
+- Give people roles based on message emoji reactions (games played, classes taken, etc.)
+- Discord Tinder
+- Summon someone
+- Warning System
+✅ Text input lowercase 
+- Tell when people join or leave
+- Weather (Will tell you forecast, current temp, high, low given a zip code)
