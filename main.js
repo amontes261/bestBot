@@ -477,7 +477,7 @@ client.on('message', async message => {
 								if (message.guild.members.cache.get(message.author.id).voice.channelID != null){
 									if (message.guild.members.cache.get(msgSplit[1].substring(3, msgSplit[1].length - 1)).voice.channelID != message.guild.members.cache.get(message.author.id).voice.channelID){ // if user searching for isnt in same channel
 										let invite = await message.guild.channels.cache.get(message.guild.members.cache.get(message.author.id).voice.channelID).createInvite();
-										message.channel.send("Join here: discord.gg/" + invite);
+										message.guild.members.cache.get(msgSplit[1].substring(3, msgSplit[1].length - 1)).send("Join here: discord.gg/" + invite);
 									}
 								}
 								message.delete();
