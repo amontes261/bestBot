@@ -22,3 +22,4 @@
 ✅ Text input lowercase 
 - Tell when people join or leave
 - Weather (Will tell you forecast, current temp, high, low given a zip code)
+- Nishant Last name
