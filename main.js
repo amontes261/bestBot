@@ -6,6 +6,10 @@ const { cli } = require('winston/lib/winston/config');
 let login = JSON.parse(fs.readFileSync('auth.json')).token;
 const dir = './directory';
 var google = require('google');
+const errFile = require('./JS\ Helpers/errMessages.js');
+const passive = require('./JS\ Helpers/passiveMonitors.js');
+const gayCmd = require('./Commands/gay.js');
+const depressionCmd = require('./Commands/depression.js')
 
 // ===========================================================
 // CLIENT ON: READY
@@ -112,15 +116,9 @@ client.on('message', async message => {
 			return;
 		// console.log(msgSplit[0]);
 		// console.log(msgSplit[1]);
-		var containsLMAO = false;
+		passive.containsLmao(message, msgSplit);
 
-		msgSplit.forEach((word) => {
-			if (word.indexOf("lmao") != -1)
-				containsLMAO = true;
-		})
-		if (containsLMAO)
-			message.react("🍑");
-
+		// usageFile.test();
 		/*
 		message.channel.send({embed: {
 			color: "C80000",
@@ -160,7 +158,7 @@ client.on('message', async message => {
 			// console.log(msgSplit.length);
 			//console.log(message);
 			if (msgSplit[0].length == 1){
-				message.channel.send("Looks like you've summoned bitchBot.\nTry \"!bitch help\" for commands.");
+				errFile.nocmd(message);
 			}
 			else{
 				const fs = require("fs"); // filesystem
@@ -172,141 +170,24 @@ client.on('message', async message => {
 					// =======================
 					case "help":
 						help(message.channel);
-					break;
+						break;
 					
 					// =======================
 					// GAY SWITCH
 					// =======================
 					case "gay":
-						var gayID = "759958809140789310";
-						var hasGayRole = false;
-						if (msgSplit.length == 1){
-							message.member.roles.cache.forEach((role) => {
-								if (role.toString().substring(3, role.toString().length - 1) == gayID)
-									hasGayRole = true;
-							})
-						}
-						else if (msgSplit.length == 2 || msgSplit.length == 3){
-							if (msgSplit.length == 2 && msgSplit[1].length == 22){
-								message.guild.members.cache.get(msgSplit[1].substring(3, msgSplit[1].length - 1)).roles.cache.forEach((role) => {
-									if (role.toString().substring(3, role.toString().length - 1) == gayID)
-									hasGayRole = true;
-								})
-							}
-							else if (msgSplit.length == 2){
-								message.channel.send("You must tag someone as your 2nd argument. Please try again");
-								return;
-							}
-							else if (msgSplit.length == 3 && msgSplit[2] == "immediate"){
-								message.guild.members.cache.get(msgSplit[1].substring(3, msgSplit[1].length - 1)).roles.cache.forEach((role) => {
-									if (role.toString().substring(3, role.toString().length - 1) == gayID)
-									hasGayRole = true;
-								})
-								if (hasGayRole){
-									message.channel.send("It seems this user is already gay...");
-								}
-								else{
-									if (msgSplit[1].substring(3, msgSplit[1].length - 1) == "403355889253220352" ){ // me
-										message.channel.send(`Unable to assign ${msgSplit[1]} as gay: it is impossible for this user to be gay.`);
-									}
-									else{
-										message.guild.members.cache.get(msgSplit[1].substring(3, msgSplit[1].length - 1)).roles.add(gayID);
-										message.channel.send(`Assigned ${msgSplit[1]} as gay.`);
-									}
-								}
-								return;
-
-							}
-							else if (msgSplit.length == 3 && msgSplit[2] == "remove"){
-								var removerIsGay = false;
-								message.guild.members.cache.get(message.author.id).roles.cache.forEach((role) => {
-									if (role.toString().substring(3, role.toString().length - 1) == gayID)
-									removerIsGay = true;
-								})
-
-								if (removerIsGay){
-									message.channel.send(`Unable to assign ${msgSplit[1]} as straight: the role remover must NOT be gay.`);
-								}
-								else{
-									message.guild.members.cache.get(msgSplit[1].substring(3, msgSplit[1].length - 1)).roles.remove(gayID);
-									message.channel.send(`Great, ${msgSplit[1]} has been declared as straight!`);
-								}
-								return;
-							}
-							else{
-								message.channel.send("Usage: Are you gay? ```!gay```\nIs another user gay?: ```!gay <Tag a User>```\nDeclare another user as gay: ```!gay <Tag a User> immediate```\nDeclare another user as straight: ```!gay <Tag a User> remove```");
-								return;
-							}
-						}
-						else{
-							message.channel.send("Usage: Are you gay? ```!gay```\nIs another user gay?: ```!gay <Tag a User>```\nDeclare another user as gay: ```!gay <Tag a User> immediate```\nDeclare another user as straight: ```!gay <Tag a User> remove```");
-							return;
-						}
-
-						if (hasGayRole){
-							if (msgSplit.length == 1){
-								message.channel.send("Unfortunately, it would appear that you, indeed, are gay.");
-							}
-							else{
-								message.channel.send(`Unfortunately, it would appear that ${msgSplit[1]} is, in fact, gay.`);
-							}
-						}
-						else{
-							if (msgSplit.length == 1){
-								message.channel.send("Fortunately, you are NOT gay.");
-							}
-							else{
-								message.channel.send(`Fortunately, ${msgSplit[1]} is NOT gay.`);
-							}
-						}
-					break;
+						if (message.guild. id != "404413479915880448")
+							errFile.onlyOnChromozone(message);
+						else
+							gayCmd.gaySwitch(message, msgSplit, errFile);
+						break;
 					
 					// =======================
 					// DEPRESSION CMD SWITCH
 					// =======================
 					case "depression":
-						var vcID = 769972737099169792;
-						if (message.member.voice.channelID == null)
-							message.channel.send(`${message.author} you must join a voice channel first.`);
-						else{
-							var quadID = 758827953781080125;
-							var hasQuadRole = false;
-							message.member.roles.cache.forEach((role) => {
-								if (role.toString().substring(3, role.toString().length - 1) == quadID)
-									hasQuadRole = true;
-							})
-
-							if (hasQuadRole){
-
-								message.guild.member(message.author.id).voice.setChannel("769972737099169792");
-								if (message.author.id == "114081086065213443"){
-									message.channel.send(`Ok ${message.author}, its depression time. Got a special song picked out, just for you...`);
-								}
-								else{
-									message.channel.send(`Ok ${message.author}, its depression time.`);
-								}
-								
-								if (message.member.voice.channel) {
-									const connection = await client.channels.cache.get("769972737099169792").join();
-
-									if (message.author.id == "114081086065213443")
-										var dispatcher = connection.play('Depresso/cant_help_20M.mp3');
-									else{
-										var dispatcher = connection.play('Depresso/robbery.mp3');
-									}
-
-									dispatcher.on('finish', () => {
-										msg.member.voice.channel.leave();
-									});
-
-									dispatcher.on('error', console.error);
-								}
-							}
-							else{
-								message.channel.send(`${message.author} you're not authorized to run this command. You must have the \"quad\" role.`)
-							}
-						}
-					break;
+						depressionCmd.depressionSwitch(message, client, msgSplit, errFile);
+						break;
 
 					// =======================
 					// PIC SWITCH
@@ -314,7 +195,7 @@ client.on('message', async message => {
 					case "pic":
 						// console.log(msgSplit[1]);
 						if (msgSplit.length == 1){
-							message.channel.send("Usage: ```!pic <Tag a user>```\nUpload a pic: ```!pic add <Tag a User>```");
+							errFile.picUsage(message);
 						}
 						else if (msgSplit.length == 2){ // send pic
 							showRandPic(msgSplit[1].substring(3, msgSplit[1].length - 1), fs, message);
@@ -332,7 +213,7 @@ client.on('message', async message => {
 					// =======================
 					case "dayssince":
 						if (msgSplit.length == 1)
-							message.channel.send("Usage: Ask how many days since:```!dayssince <tag a user>```\nSet how many days since: ```!dayssince <tag a user> <number of days>```\nToday's the big day: ```!dayssince <tag a user> reset```")
+							errFile.daysSince(message);
 						else{
 							var who;
 							// console.log(msgSplit[1].substring(3, msgSplit[1].length - 1));
@@ -367,14 +248,14 @@ client.on('message', async message => {
 					// =======================
 					case "clip":
 						if (msgSplit.length == 1)
-							message.channel.send("Usage: Play a clip:```!clip <clip name>```\nUpload a clip: ```!bitch clip upload <clip name>```\nList all available clips that can be sent: ```!bitch clip list```")
+							errFile.clip(message);
 						else if (msgSplit.length >= 2){
 							if (msgSplit.length == 2 && msgSplit[1] == "list"){
 								message.channel.send("Here's a list of the available clips:");
 
 								fs.readdir(`Clips/`, (err, files) => {
 									if (err)
-										message.channel.send(`An unexpected error has occurred... (Tagging <@403355889253220352> to get his attention)`);
+										errFile.unexpectedErr(message, msgSplit);
 									else{
 										var pasteMsg = "";
 										files.forEach(file => {
@@ -392,12 +273,12 @@ client.on('message', async message => {
 
 							}
 							else if (msgSplit.length == 2 && msgSplit[1] == "upload"){
-								message.channel.send("This command isn't supported yet. Coming soon.");
+								errFile.missingNewFeature(message);
 							}
 							else if (msgSplit.length == 2){
 								fs.readdir(`Clips/`, (err, files) => {
 									if (err)
-										message.channel.send(`An unexpected error has occurred... (Tagging <@403355889253220352> to get his attention)`);
+										errFile.unexpectedErr(message, msgSplit);
 									else{
 										var exists = false;
 										files.forEach(file => {
@@ -416,11 +297,11 @@ client.on('message', async message => {
 								});
 							}
 							else{
-								message.channel.send("There was a problem with the 3rd argument entered. Please try again");
+								errFile.thirdArgProblem(message);
 							}
 						}
 						else{
-							message.channel.send("There was a problem with the arguments you entered. Please try again");
+							errFile.generalArgProblem(message);
 						}
 						break;
 
@@ -429,7 +310,7 @@ client.on('message', async message => {
 					// =======================
 					case "coinflip":
 						if (msgSplit.length != 1){
-							message.channel.send("Usage: Flip a coin: ```!coinflip```")
+							errFile.coinflip(message);
 						}
 						else{
 							var coin = parseInt( Math.random() * 2 , 10);
@@ -440,6 +321,7 @@ client.on('message', async message => {
 									color: "00C500",
 									title: "Heads",
 									description: "The result of the requested coinflip is **heads**.",
+									timestamp: new Date(),
 									footer: {
 										text: `Coinflip requested by ${message.guild.members.cache.get(message.author.id).displayName}`
 									}
@@ -449,8 +331,8 @@ client.on('message', async message => {
 									color: "C80000",
 									title: "Tails",
 									description: "The result of the requested coinflip is **tails**.",
+									timestamp: new Date(),
 									footer: {
-										timestamp: new Date(),
 										text: `Coinflip requested by ${message.guild.members.cache.get(message.author.id).displayName}`
 									}
 								}});
@@ -462,7 +344,7 @@ client.on('message', async message => {
 					// GOOGLE SWITCH
 					// =======================
 					case "google":
-						message.channel.send("This implementation is under construction.........");
+						errFile.missingNewFeature(message);
 						return;
 						var textToSearch = '';
 						for (var i = 1; i < msgSplitUpper.length; i++){
@@ -497,7 +379,7 @@ client.on('message', async message => {
 					// =======================
 					case "summon":
 						if (msgSplit.length == 1){
-							message.channel.send("Usage: Get user's attention here: ```!summon <Tag a user> <(Optional) Num. of Pings, Max: 5>```\nGet a user's attention via DM: ```!summon <Tag a user> DM <(Optional) Num. of Pings, Max: 5>```");
+							errFile.summon(message);
 						}
 						else if (msgSplit.length == 2){
 							if (msgSplit.length == 2 && msgSplit[1].length == 22){
@@ -515,7 +397,7 @@ client.on('message', async message => {
 								message.delete();
 							}
 							else
-								message.channel.send("Usage: Get user's attention here: ```!summon <Tag a user> <(Optional) Num. of Pings, Max: 5>```\nGet a user's attention via DM: ```!summon <Tag a user> DM <(Optional) Num. of Pings, Max: 5>```");
+								errFile.summon(message);
 						}
 						else if (msgSplit.length == 3 && msgSplit[1].length == 22){
 							if (message.author.id == msgSplit[1].substring(3, msgSplit[1].length - 1) )
@@ -549,9 +431,8 @@ client.on('message', async message => {
 									message.delete();
 								}
 							}
-							else{
-								message.channel.send("Usage: Get user's attention here: ```!summon <Tag a user> <(Optional) Num. of Pings, Max: 5>```\nGet a user's attention via DM: ```!summon <Tag a user> DM <(Optional) Num. of Pings, Max: 5>```");
-							}
+							else
+								errFile.summon(message);
 						}
 
 						else if(msgSplit.length == 4 && msgSplit[1].length == 22 && msgSplit[2] == "dm" && (!isNaN(msgSplit[3]) && msgSplit[3] > 0) ){
@@ -581,7 +462,7 @@ client.on('message', async message => {
 							}
 						}
 						else
-							message.channel.send("Usage: Get user's attention here: ```!summon <Tag a user> <(Optional) Num. of Pings, Max: 5>```\nGet a user's attention via DM: ```!summon <Tag a user> DM <(Optional) Num. of Pings, Max: 5>```");
+							errFile.summon(message);
 						break;
 				} // switch end
 
@@ -626,7 +507,7 @@ function showRandPic(name, fs, msg){
 			msg.channel.send(`There don't seem to be any pictures for <@${name}>.`);
 	}
 	catch (e){
-		msg.channel.send(`An unexpected error has occurred... (Tagging <@403355889253220352> to get his attention)`);
+		errFile.unexpectedErr(message, msgSplit);
 	}
 }
 
