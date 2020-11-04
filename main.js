@@ -19,8 +19,6 @@ client.on('ready', () => {
 
 	console.log("bitchBot is now online.")
 	// client.guilds.cache.get(chromozoneID).channels.cache.get(clientLogsChannelID).send("bitchBot is now online.")
-	
-	// client.guilds.cache.get(chromozoneID).members.cache.get("403355889253220352").send(`Welcome to **THE CHROMOZONE 2.0**. You've been provided with the **Un-approved** role– please DM <@403355889253220352> or any other admin to become approved`);
 
 
 	// ensure proper number of members is listed //
@@ -87,6 +85,7 @@ client.on("guildMemberRemove", function(member){
 // ===========================================================
 
 client.on('message', async message => {
+	// client.guilds.cache.get("404413479915880448").members.cache.get("403355889253220352").send(`test`);
 	// console.log(message.member.voice);
 	if (message.author.bot) return;
 
@@ -121,6 +120,39 @@ client.on('message', async message => {
 		})
 		if (containsLMAO)
 			message.react("🍑");
+
+		/*
+		message.channel.send({embed: {
+			color: "C80000",
+			author: {
+				name: client.user.username,
+				icon_url: client.user.avatarURL
+			},
+			title: "This is an embed",
+			url: "http://google.com",
+			description: "This is a test embed to showcase what they look like and what they can do.",
+			fields: [{
+				name: "Fields",
+				value: "They can have different fields with small headlines."
+				},
+				{
+				name: "Masked links",
+				value: "You can put [masked links](http://google.com) inside of rich embeds."
+				},
+				{
+				name: "Markdown",
+				value: "You can put all the *usual* **__Markdown__** inside of them."
+				}
+			],
+			timestamp: new Date(),
+			footer: {
+				icon_url: client.user.avatarURL,
+				text: "© Example"
+			}
+			}
+		});
+		*/
+
 
 		if (msgSplit[0] == "nice")
 			message.channel.send("nice");
@@ -404,9 +436,25 @@ client.on('message', async message => {
 							// console.log(coin);
 
 							if (coin == 0)
-								message.channel.send("The result of the flipped coin is **heads**");
+								message.channel.send({embed: {
+									color: "00C500",
+									title: "Heads",
+									description: "The result of the requested coinflip is **heads**.",
+									footer: {
+										text: `Coinflip requested by ${message.guild.members.cache.get(message.author.id).displayName}`
+									}
+								}});
 							else
-								message.channel.send("The result of the flipped coin is **tails**");
+								message.channel.send({embed: {
+									color: "C80000",
+									title: "Tails",
+									description: "The result of the requested coinflip is **tails**.",
+									footer: {
+										timestamp: new Date(),
+										text: `Coinflip requested by ${message.guild.members.cache.get(message.author.id).displayName}`
+									}
+								}});
+							message.delete();
 						}
 					break;
 
