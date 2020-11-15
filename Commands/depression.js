@@ -1,5 +1,10 @@
 
 async function depressionSwitch(message, client, msgSplit, errFile){
+    if (message.guild.id != '404413479915880448'){
+        message.channel.send(errFile.onlyOnChromozone(message) );
+        return;
+    }
+    
     var vcID = 769972737099169792;
     if (message.member.voice.channelID == null)
         message.channel.send(`${message.author} you must join a voice channel first.`);

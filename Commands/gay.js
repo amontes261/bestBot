@@ -1,5 +1,9 @@
 
-function gaySwitch(message, msgSplit, errFile){
+function gaySwitch(message, msgSplit, errFile, Discord){
+    if (message.guild.id != "404413479915880448"){
+        errFile.onlyOnChromozone(message);
+        return;
+    }
     var gayID = "759958809140789310";
     var hasGayRole = false;
     if (msgSplit.length == 1){
@@ -12,8 +16,12 @@ function gaySwitch(message, msgSplit, errFile){
         if (msgSplit.length == 2 && msgSplit[1].length == 22){
             message.guild.members.cache.get(msgSplit[1].substring(3, msgSplit[1].length - 1)).roles.cache.forEach((role) => {
                 if (role.toString().substring(3, role.toString().length - 1) == gayID)
-                hasGayRole = true;
+                    hasGayRole = true;
             })
+        }
+        else if (msgSplit.length == 2 && msgSplit[1] == 'help'){
+            errFile.gay(message, Discord);
+            return;
         }
         else if (msgSplit.length == 2){
             errFile.tagSecondArg(message);
@@ -56,19 +64,31 @@ function gaySwitch(message, msgSplit, errFile){
             return;
         }
         else{
-            errFile.gayUsage(message);
+            errFile.gay(message, Discord);
             return;
         }
     }
     else{
-        errFile.gayUsage(message);
+        errFile.gay(message, Discord);
         return;
     }
 
-    if (hasGayRole)
-        printGay(message, msgSplit, true);
-    else
-        printGay(message, msgSplit, false);
+    if (msgSplit.length == 1){
+        if (hasGayRole && message.author.id == "403355889253220352") // if someone gives me role
+            printGay(message, msgSplit, false);
+        else if (hasGayRole)
+            printGay(message, msgSplit, true);
+        else
+            printGay(message, msgSplit, false);
+    }
+    else{
+        if (hasGayRole && msgSplit[1].substring(3, msgSplit[1].length - 1) == "403355889253220352") // if someone gives me role
+            printGay(message, msgSplit, false);
+        else if (hasGayRole)
+            printGay(message, msgSplit, true);
+        else
+            printGay(message, msgSplit, false);
+    }
 }
 
 

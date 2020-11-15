@@ -1,15 +1,17 @@
 - Birthdays (list birthday and days until)
 - Google "This" and then provide link
-- Poll (Vote)
+✅ Poll (Vote)
+    - Fix cmd to work with default capitalization
 - Server Management
     - Ban, Mute, etc.
     ✅  Review features of Mee6 Bot and implement those
 ✅ Flip a coin
-- Music Bot?
+- Music Bot
+    - Be able to pause, stop, queue and adjust volume
 - Join and Play Clips
 - To-do list
     -Asynchronous and synchronous
-- Porn sounds
+- Pnsnds
 ✅  Is <Person> gay
     ✅ Declare person as gay
 ✅ Depression time
@@ -17,9 +19,29 @@
     - Add more music to depression folder
 - Give people roles based on message emoji reactions (games played, classes taken, etc.)
 - Discord Tinder
-- Summon someone
+✅ Summon someone
 - Warning System
 ✅ Text input lowercase 
 - Tell when people join or leave
+✅ Ping
 - Weather (Will tell you forecast, current temp, high, low given a zip code)
 - Nishant Last name
+✅ Get person's discord profile pic
+✅ Shut down bot command
+	✅ React to confirm
+✅ Assign Role Cmd
+✅ Move everyone in Among Us dead to regular among Us
+    ✅ Assert Chromozone server for command
+- AliA Bot Errp
+✅ Serevr Mute & deafen / Undeafen
+- Have bitchBot react using !r and then a reaction indicator
+    - Will send message and then delete your cmd
+    - Option to make it timed
+- Connect 4
+- Rock Paper Scissors
+- Detect multiple instances (Passive)
+- Math cmd
+✅ Invite bot to server cmd
+    ✅ !invite user too 
+- Read in and store quotes
+    - Can ask bot for quote from random person
