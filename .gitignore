@@ -1,4 +1,20 @@
-# Directories
-# auth.json
+## .gitIgnore for mookBot ##
+
+#Media Directories
 node_modules/
-auth.json
+Clips/
+Depresso/
+EarRp/
+Pics/
+RPS_clipart/
+
+#Data Mgmt & Token JSON Files
+Data_Management/
+
+#Heroku (Depreciated)
+Procfile
+
+#Miscallaneous
+package-lock.json
+Ideas.txt
+embed_commands.txt

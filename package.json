@@ -1,16 +1,20 @@
 {
-  "name": "bitchBot",
+  "name": "mookBot",
   "version": "0.0.1",
-  "description": "Welcome to Bitchbot. I'm sorry if you added this to your server.",
+  "description": "Welcome to mookBot–– est. Oct, 2020",
   "main": "bot.js",
-  "author": "Alex",
+  "author": "a.montes28#4501",
   "dependencies": {
     "@discordjs/opus": "^0.3.3",
     "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
-    "discord.js": "^12.4.1",
+    "discord.js": "^12.5.0",
+    "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.2.7",
+    "fluent-ffmpeg": "^2.1.2",
     "google": "^2.1.0",
-    "winston": "^3.3.3"
+    "mathjs": "^8.0.1",
+    "winston": "^3.3.3",
+    "ytdl-core": "^4.0.5"
   },
   "devDependencies": {},
   "scripts": {

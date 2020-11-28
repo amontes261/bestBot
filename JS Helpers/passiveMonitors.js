@@ -1,4 +1,8 @@
 
+function assertActivity(client){
+	client.user.setActivity('everything | use !help');
+}
+
 function containsLmao(message, msgSplit){
     var containsLMAO = false;
 		msgSplit.forEach((word) => {
@@ -7,6 +11,25 @@ function containsLmao(message, msgSplit){
 		})
 		if (containsLMAO)
 			message.react("🍑");
+}
+
+function filterSayCommand(message, msgSplit){
+	var hasAlex = false;
+	var hasGay = false;
+
+	msgSplit.forEach((word) => {
+		if (word.indexOf("alex") != -1)
+			hasAlex = true;
+		if (word.indexOf("gay") != -1)
+			hasGay = true;
+	})
+
+	if (hasAlex && hasGay){
+		message.delete();
+		return true;
+	}
+	else
+		return false;
 }
 
 function onewordChecks(message, msgSplit){
@@ -36,4 +59,4 @@ function onewordChecks(message, msgSplit){
 }
 
 
-module.exports = { containsLmao, onewordChecks };
+module.exports = { assertActivity, containsLmao, filterSayCommand, onewordChecks };

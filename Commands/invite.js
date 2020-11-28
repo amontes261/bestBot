@@ -1,15 +1,10 @@
 
 async function inviteSwitch(message, Discord, msgSplit, errFile){
     if (msgSplit.length == 1){
-        var name = '';
-        if (message.guild.members.cache.get("502354442054664192").displayName == "bitch🅱ot")
-            name = 'bitchBot';
-        else
-            name = message.guild.members.cache.get("502354442054664192").displayName;
         const embeddedMsg = new Discord.MessageEmbed()
-            .setColor('#0099ff')
-            .setTitle(`Click Here To Add ${name} To a Server`)
-            .setURL('https://discord.com/api/oauth2/authorize?client_id=502354442054664192&permissions=8&scope=bot')
+            .setColor('#0099ff') // light blue
+            .setTitle(`Click Here To Add ${message.guild.members.cache.get("502354442054664192").displayName} To a Server`)
+            .setURL('https://discord.com/api/oauth2/authorize?client_id=502354442054664192&permissions=0&scope=bot')
             .setTimestamp()
             .setFooter(`Invite link requested by ${message.guild.members.cache.get(message.author.id).displayName}`);
         message.channel.send(embeddedMsg);
