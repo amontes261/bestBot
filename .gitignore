@@ -6,7 +6,6 @@ Clips/
 Depresso/
 EarRp/
 Pics/
-RPS_clipart/
 
 #Data Mgmt & Token JSON Files
 Data_Management/
@@ -18,3 +17,4 @@ Procfile
 package-lock.json
 Ideas.txt
 embed_commands.txt
+.DS_Store
