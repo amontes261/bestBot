@@ -1,6 +1,21 @@
+
+//////////////////////////////////////////////
+//// shutdown.js – JavaScript x DiscordJS ////
+//// Alex Montes  –––––  @a.montes28#4501 ////
+//////////////////////////////////////////////
+
 async function shutdownSwitch(message, Discord, errFile, client){
+    
+/* - Asynchronous function shutdownSwitch() was designed to ONLY be called from file main.js
+
+    - Meant to be able to remotely shut the bot down
+
+    - Was designed to be triggered via command: !shutdown
+
+    - Only Alex can use the command */
+
     if (message.author.id != "403355889253220352"){
-        errFile.permissionDenied(message);
+        errFile.permissionDenied(message, Discord, 'shutdown');
     }
     else{
         const reply = new Discord.MessageEmbed()
@@ -46,7 +61,6 @@ async function shutdownSwitch(message, Discord, errFile, client){
                             
                         await clientLogChannel.send(logShutdownMsg);
                     }
-
                     client.destroy();
                 }
                 else{

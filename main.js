@@ -4,7 +4,7 @@
 const Discord = require('discord.js')
 const client = new Discord.Client()
 const fs = require("fs"); // filesystem
-let login = JSON.parse(fs.readFileSync('Data_Management/auth.json')).token;
+let login = JSON.parse(fs.readFileSync('Data_Management/loginToken.json')).token;
 const youtube = require('ytdl-core');
 const math = require('mathjs');
 
@@ -13,6 +13,7 @@ const math = require('mathjs');
 // ============= //
 const errFile = require('./JS\ Helpers/errMessages.js');
 const passive = require('./JS\ Helpers/passiveMonitors.js');
+
 const gayCmd = require('./Commands/gay.js');
 const depressionCmd = require('./Commands/depression.js');
 const pollCmd = require('./Commands/poll.js');
@@ -38,7 +39,10 @@ const mathCmd = require('./Commands/math.js');
 const rpsCmd = require('./Commands/rockpaperscissors.js');
 const moderationCmds = require('./Commands/moderation.js');
 const restartCmd = require('./Commands/restart.js');
-const guildCmd = require('./Commands/guild.js');
+const authCmd = require('./Commands/auth.js');
+const repoCmd = require('./Commands/repo.js');
+const cheggCmd = require('./Commands/chegg.js');
+const restoreCmd = require('./Commands/restore.js');
 
 // ===========================================================
 // CLIENT ON: READY
@@ -63,11 +67,12 @@ client.on('ready', () => {
 
 		clientLogChannel.send(logStartupMsg);
 	}
-	
+
+	client.user.setActivity('over 25 cmds: use !help');
+
 	// ======================== //
 	// STREAM LAUNCH TO CONSOLE //
-	// ======================== //
-	client.user.setActivity('everything | use !help');
+	// ======================== //\
 	console.log("\n==============================");
 	console.log("bestBot is now online.\n")
 
@@ -78,7 +83,7 @@ client.on('ready', () => {
 		console.log(`Running on ${numServers} servers:`);
 
 	client.guilds.cache.forEach((guild) => {
-		console.log(guild.name);
+		console.log(' •' + guild.name);
 	})
 	console.log("==============================");
 })
@@ -89,7 +94,7 @@ client.on('ready', () => {
 
 client.on("guildMemberAdd", function(member){
 	var chromozoneID = "404413479915880448";
-	if (client.guild.id != chromozoneID)
+	if (member.guild.id != chromozoneID)
 		return;
 
 	var dashboardID = "759971676418605066";
@@ -117,7 +122,7 @@ client.on("guildMemberAdd", function(member){
 
 client.on("guildMemberRemove", function(member){
 	var chromozoneID = "404413479915880448";
-	if (client.guild.id != chromozoneID)
+	if (member.guild.id != chromozoneID)
 		return;
 	
 	var dashboardID = "759971676418605066";
@@ -127,7 +132,7 @@ client.on("guildMemberRemove", function(member){
 	if (member.user.bot)
 		client.guilds.cache.get(chromozoneID).channels.cache.get(dashboardID).send(`Discord Bot **@${member.user.tag.substring(0, member.user.tag.length - 5)}** has been removed from the server. There are now ${numMembers} members remaining.`)
 	else
-		client.guilds.cache.get(chromozoneID).channels.cache.get(dashboardID).send(`The member **@${member.user.tag.substring(0, member.user.tag.length - 5)}** has left or been removed from the server. There are now ${numMembers} members remaining.`)
+		client.guilds.cache.get(chromozoneID).channels.cache.get(dashboardID).send(`Member **@${member.user.tag.substring(0, member.user.tag.length - 5)}** has left or been removed from the server. There are now ${numMembers} members remaining.`)
 
 	client.guilds.cache.get(chromozoneID).channels.cache.get(memberCountChannelID).setName(`Members: ${numMembers}`);
 });
@@ -139,36 +144,31 @@ client.on("guildMemberRemove", function(member){
 
 client.on('message', async message => {
 	// client.guilds.cache.get("404413479915880448").members.cache.get("403355889253220352").send(`test`);
-	// console.log(message.member.voice);
+	
+	// SPLIT UP MESSAGE INTO ARRAY //
+	if (message.content.split(' ').length != 0){
+		var msgSplitUndefined = message.content.split(' ');
+		var msgSplitUpper = msgSplitUndefined.filter(word => word != undefined);
+		var msgSplit = [];
+		msgSplitUpper.forEach((word) => {
+			msgSplit.push(word.toLowerCase() );
+		})
+	}
+	else
+		return;
+
+	// PASSIVE CHECKS (Also checks bot messages) //
 	passive.assertActivity(client);
+	if (passive.deleteVincentBruh(message, msgSplit, Discord) ) return;
+
 	if (message.author.bot) return;
-
-	//console.log(message.author.id);
-	// console.log(client.guilds.cache.get("404413479915880448").members.cache.get("403355889253220352").voice);
-	// return;
-
-	/*
-	var msgSplit = message.split(" ");
-	if (msgSplit[0] == "!bitch" && msgSplit.length > 1){
-		botMgmt.send("testing complete")
-		*/
-		//console.log(message);
-		
-		if (message.content.split(' ').length != 0){
-			var msgSplitUndefined = message.content.split(' ');
-			var msgSplitUpper = msgSplitUndefined.filter(word => word != undefined);
-			var msgSplit = [];
-			msgSplitUpper.forEach((word) => {
-				msgSplit.push(word.toLowerCase() );
-			})
-		}
-		else
-			return;
-		// console.log(msgSplit[0]);
-		// console.log(msgSplit[1]);
+		// PASSIVE CHECKS (DOES NOT check bot messages) //
+		passive.containsGay(message, msgSplit);
 		passive.containsLmao(message, msgSplit);
+		passive.ensureCorrectMemberCount(message);
 		if (passive.filterSayCommand(message, msgSplit) ) return;
 		if (passive.onewordChecks(message, msgSplit) ) return;
+		
 
 		else if (msgSplit[0][0] == '!'){
 			// console.log(msgSplit.length);
@@ -182,14 +182,20 @@ client.on('message', async message => {
 				// var chosenPhotoNumber = 0; // number of the selected photo
 				switch(String(msgSplit[0].substring(1, msgSplit[0].length))){
 
-					case "help":
-						errFile.help(message, Discord, message.guild.id);
-						break;
+					default:
+						errFile.invalidCmd(message, Discord, msgSplit[0].substring(1, msgSplit[0].length) );
+					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "amongus":
 						amongusCmd.amongusSwitch(message, Discord, msgSplit, errFile);
+					break;
+
+					// ==================================== //
+					// ==================================== //
+					case "auth":
+						authCmd.authSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
@@ -206,8 +212,14 @@ client.on('message', async message => {
 
 					// ==================================== //
 					// ==================================== //
+					case "chegg":
+						cheggCmd.cheggSwitch(message, Discord, msgSplitUpper, errFile);
+					break;
+
+					// ==================================== //
+					// ==================================== //
 					case "clip":
-						clipCmd.clipSwitch(message, Discord, fs, msgSplit, errFile);
+						clipCmd.clipSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
@@ -219,31 +231,39 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "dayssince":
-						dayssinceCmd.dayssinceSwitch(message, fs, msgSplit, errFile);
+						dayssinceCmd.dayssinceSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "depression":
-						depressionCmd.depressionSwitch(message, client, msgSplit, errFile);
+						depressionCmd.depressionSwitch(message, Discord, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "earrape":
-						earrapeCmd.earrapeSwitch(message, Discord, fs, msgSplit, errFile);
+						earrapeCmd.earrapeSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break
 
 					// ==================================== //
 					// ==================================== //
 					case "feedback":
-						feedbackCmd.feedbackSwitch(message, Discord, fs, msgSplit, errFile);
+						feedbackCmd.feedbackSwitch(message, Discord, fs, msgSplit, errFile, client);
+					break;
+
+					case "focs":
+						var output = 0;
+						for (var i = 1; i <= 20000000; i++){
+							output += (1/i);
+						}
+						message.channel.send(output);
 					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "gay":
-						gayCmd.gaySwitch(message, msgSplit, errFile, Discord);
+						gayCmd.gaySwitch(message, Discord, msgSplit, errFile, client);
 					break;
 					
 					// ==================================== //
@@ -254,8 +274,8 @@ client.on('message', async message => {
 
 					// ==================================== //
 					// ==================================== //
-					case "guild":
-						guildCmd.guildSwitch(message, Discord, fs, msgSplit, errFile);
+					case "help":
+						errFile.help(message, Discord, fs);
 					break;
 
 					// ==================================== //
@@ -267,7 +287,7 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "isolate":
-						isolateCmd.isolateSwitch(message, Discord, msgSplit, errFile);
+						isolateCmd.isolateSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
@@ -285,19 +305,19 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "pic":
-						picCmd.picSwitch(message, Discord, fs, msgSplit, errFile);
+						picCmd.picSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "ping":
-						pingCmd.pingSwitch(message, Discord);
+						pingCmd.pingSwitch(message, Discord, msgSplit);
 					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "play":
-						playCmd.playSwitch(message, Discord, youtube, msgSplit, errFile);
+						playCmd.playSwitch(message, Discord, msgSplit, errFile, client, youtube);
 					break;
 
 					// ==================================== //
@@ -308,22 +328,32 @@ client.on('message', async message => {
 
 					// ==================================== //
 					// ==================================== //
-					case "restart":
-						errFile.depreciated(message, Discord);
-						return;
-						restartCmd.restartSwitch(message, Discord, login, client);
+					case "repo":
+						repoCmd.repoSwitch(message, Discord, msgSplit, errFile);
 					break;
 
 					// ==================================== //
 					// ==================================== //
-					case "rps":
-						rpsCmd.rpsSwitch(message, Discord, msgSplit, errFile);
+					case "restart":
+						restartCmd.restartSwitch(message, Discord, errFile, login, client);
+					break;
+
+					// ==================================== //
+					// ==================================== //
+					case "restore":
+						restoreCmd.restoreSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 					
 					// ==================================== //
 					// ==================================== //
 					case "role":
-						roleCmd.roleSwitch(message, Discord, msgSplit, errFile);
+						roleCmd.roleSwitch(message, Discord, fs, msgSplit, errFile, client);
+					break;
+
+					// ==================================== //
+					// ==================================== //
+					case "rps":
+						rpsCmd.rpsSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
@@ -341,12 +371,14 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "silence":
-						silenceCmd.silenceSwitch(message, Discord, msgSplit, errFile);
+						silenceCmd.silenceSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "stop":
+						errFile.missingNewFeature(message, Discord);
+						return;
 						Discord.StreamDispatcher.destroy();
 					break;
 
@@ -359,31 +391,7 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "unban":
-						moderationCmds.unbanSwitch(message, Discord, msgSplit, errFile);
-					break;
-
-
-					case "focs":
-						errFile.depreciated(message);
-						return;
-
-						var highestAvg = 0;
-						for (var i = 0; i < 10000; i++){
-							if (10000 % i == 0){
-								var avg = (0.5 * (i + 1) ) + (0.5 * 1);
-								if (avg > highestAvg)
-									highestAvg = avg;
-								const focsEmbed = new Discord.MessageEmbed()
-									.setColor('8140FF')
-									.setTitle('Positive Test')
-									.setDescription(`Avg Tests: ${avg}
-									Batch Size: ${i}
-									Group Count: ${10000 / i}
-									Batch Size - Test Avg: ${i - avg}`)
-								message.channel.send(focsEmbed);
-							}
-						}
-						message.channel.send(`Testing Complete: Largest Average is ${highestAvg}`);
+						moderationCmds.unbanSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					

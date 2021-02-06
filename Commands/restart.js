@@ -1,5 +1,21 @@
 
-async function restartSwitch(message, Discord, login, client){
+///////////////////////////////////////////////
+//// restart.js – JavaScript x DiscordJS //////
+//// Alex Montes –––––– @a.montes28#4501 //////
+///////////////////////////////////////////////
+
+async function restartSwitch(message, Discord, errFile, login, client){
+        
+/* - Asynchronous function restartSwitch() was designed to ONLY be called from file main.js
+
+    - Meant to be able to remotely restart the bot down
+
+    - Was designed to be triggered via command: !restart
+
+    - This command will likely be depreciated */
+    
+    errFile.depreciated(message, Discord, 'restart');
+	return;
     const reply = new Discord.MessageEmbed()
         .setColor('EFEF00') // yellow
         .setTitle('Restart Command Received')
@@ -28,7 +44,6 @@ async function restartSwitch(message, Discord, login, client){
         msg.awaitReactions((reaction, user) => (reaction.emoji.name == '✅' || reaction.emoji.name == '❌'),
         { max: 1, time: 15000 }).then( async collected => {
             if (collected.first().emoji.name == '✅') {
-                await message.delete();
                 await msg.delete();
                 await client.login(login);
                 await message.channel.send(restartMsg)
@@ -37,7 +52,6 @@ async function restartSwitch(message, Discord, login, client){
             }
             else{
                 message.channel.send(cancelledMsg);
-                message.delete();
                 msg.delete();
             }
         });

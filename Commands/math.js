@@ -1,17 +1,32 @@
 
+////////////////////////////////////////////
+//// math.js – JavaScript x DiscordJS //////
+//// Alex Montes ––– @a.montes28#4501 //////
+////////////////////////////////////////////
+
 function mathSwitch(message, Discord, msgSplit, errFile, math){
 
+ /* - Function mathSwitch() was designed to ONLY be called from file main.js
 
-    if (msgSplit.length == 1){
+    - Small, cosmetic, ease-of-life command – usable on any server
+
+    - Was designed to be triggered via command: !math
+
+    - Try !math help to have the bot to provide a usage message */
+       
+    if (msgSplit.length == 1) // Incorrect command usage message //
         errFile.math(message, Discord);
-    }
+    else if (msgSplit.length == 2 && msgSplit[1] == "help") // Command usage message requested //
+        errFile.math(message, Discord);
     else{
+        // Strip entire equation of any whitespace //
         var equation = '';
         for (var i = 1; i < msgSplit.length; i++){
             if (msgSplit[i] != '')
                 equation += msgSplit[i];
         }
 
+        // Create refined equation for output back to user //
         var refinedEquation = '';
             for (var i = 0; i < equation.length; i++){
                 if (equation[i] == '*')
@@ -19,8 +34,34 @@ function mathSwitch(message, Discord, msgSplit, errFile, math){
                 else
                     refinedEquation += equation[i];
             }
+
+        // Ensure no variables exist in the equation // 
+        if (hasVariable(equation) ){
+            const embeddedMsg = new Discord.MessageEmbed()
+                .setColor('C80000') // red
+                .setTitle(`Computation Failed`)
+                .setDescription(`The math feature does not support variables.\nPlease check your entry and try again.`)
+                .addField('**Equation entered:**', `${refinedEquation}`, false)
+                .setTimestamp()
+                .setFooter(`Flawed equation entered by ${message.guild.members.cache.get(message.author.id).displayName}`);
+            message.channel.send(embeddedMsg);
+            return;
+        }
+
+        // Ensure only allowed symbols are used // 
+        if (!properSymbols(equation) ){
+            const embeddedMsg = new Discord.MessageEmbed()
+                .setColor('C80000') // red
+                .setTitle(`Computation Failed`)
+                .setDescription(`The equation you entered has improper symbols in it.\nPlease check your entry and try again.`)
+                .addField('**Equation entered:**', `${refinedEquation}`, false)
+                .setTimestamp()
+                .setFooter(`Flawed equation entered by ${message.guild.members.cache.get(message.author.id).displayName}`);
+            message.channel.send(embeddedMsg);
+            return;
+        }
         
-        // console.log("equation: " + equation);
+        // Ensure all opened parentheses are closed, output error if not all are closed // 
         if (parenthesesMatch(equation) != 0){
             var parenthesesOffset = parenthesesMatch(equation);
 
@@ -41,19 +82,24 @@ function mathSwitch(message, Discord, msgSplit, errFile, math){
                 embeddedMsg.setDescription(`There are ${Math.abs(parenthesesOffset)} closing parentheses missing\nPlease check your entry and try again.`)
 
             message.channel.send(embeddedMsg);
-            message.delete();
         }
         else{
-            try{
+            try{ // Attenpt to evaluate equation //
                 var answer = math.evaluate(equation).toString();
             }
-            catch (e) {
-                
-
-                message.channel.send("nishant = gay (error occurred- this will be coded soon)");
+            catch(e){ // Case: Evaluation Failed //
+                const embeddedMsg = new Discord.MessageEmbed()
+                    .setColor('C80000') // red
+                    .setTitle(`Computation Failed`)
+                    .setDescription(`Eithre you've entered an invalid equation or something went wrong.\nPlease check your entry and try again.`)
+                    .addField('**Equation entered:**', `${refinedEquation}`, false)
+                    .setTimestamp()
+                    .setFooter(`Flawed equation entered by ${message.guild.members.cache.get(message.author.id).displayName}`);
+                message.channel.send(embeddedMsg);
                 return;
             }
 
+            // Will only get this far if "valid" answer calculated //
             var refinedAnswer = '';
             var counter = 0;
             var decimalReached = (answer.indexOf('.') == -1 );
@@ -66,10 +112,15 @@ function mathSwitch(message, Discord, msgSplit, errFile, math){
                 else if (!decimalReached){
                     refinedAnswer = answer[i] + refinedAnswer;
                 }
-                else if (answer == "Infinity"){
-                    refinedAnswer = "Infinity (Insanely Large Number)";
+                else if (answer == "Infinity"){ // Case: Answer is extremely large //
+                    refinedAnswer = "Very, Very Large Number";
+                    break;
                 }
-                else{
+                else if (answer == "NaN"){ // Case: Number DNE //
+                    refinedAnswer = "Not A Number...";
+                    break;
+                }
+                else{ // Adds commas to answers greater than 999 //
                     if (counter % 3 == 0 && counter != 0){
                         counter = 0;
                         refinedAnswer = ',' + refinedAnswer;
@@ -80,20 +131,33 @@ function mathSwitch(message, Discord, msgSplit, errFile, math){
             }
 
             const embeddedMsg = new Discord.MessageEmbed()
-                .setColor('00C500') // green
-                .setTitle(`Answer: ${refinedAnswer}`)
-                .setDescription(`Equation: ${refinedEquation}`)
+                if (answer == 'NaN' || answer == "Infinity"){
+                    embeddedMsg.setTitle(`${refinedAnswer}`)
+                        .setColor('EFEF00') // yellow
+                }
+                else{
+                    embeddedMsg.setTitle(`Answer: ${refinedAnswer}`)
+                    .setColor('00C500') // green
+                }
+                embeddedMsg.setDescription(`Equation: ${refinedEquation}`)
                 .setTimestamp()
                 .setFooter(`Computation requested by ${message.guild.members.cache.get(message.author.id).displayName}`);
 
             message.channel.send(embeddedMsg);
-            message.delete();
         }
     }
 
 }
 
 // =========================================================
+
+function hasVariable(equation){
+    for (var i = 0; i < equation.length; i++){
+        if (equation[i].toLowerCase() != equation[i].toUpperCase())
+            return true;
+    }
+    return false;
+}
 
 function parenthesesMatch(equation){
     var numOpen = 0;

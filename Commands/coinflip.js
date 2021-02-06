@@ -1,11 +1,24 @@
 
+////////////////////////////////////////////////
+//// coinflip.js – JavaScript x DiscordJS //////
+//// Alex Montes  –––––  @a.montes28#4501 //////
+////////////////////////////////////////////////
+
 function coinflipSwitch(message, Discord, msgSplit, errFile){
-    if (msgSplit.length != 1){
+
+/* - Function coinflipSwitch() was designed to ONLY be called from file main.js
+
+    - Small, cosmetic command – usable on any server
+
+    - Was designed to be triggered via command: !coinflip
+
+    - Try !coinflip help to have the bot to provide a usage message */
+   
+    if (msgSplit.length != 1){ // Incorrect command usage message //
         errFile.coinflip(message, Discord);
     }
-    else{
-        var coin = parseInt( Math.random() * 2 , 10);
-        // console.log(coin);
+    else{ // Execute coinflip command //
+        var coin = parseInt( Math.random() * 2 , 10); 
 
         const embeddedMsg = new Discord.MessageEmbed()
             .setColor('00C500') // green
@@ -22,7 +35,6 @@ function coinflipSwitch(message, Discord, msgSplit, errFile){
         }
         
         message.channel.send(embeddedMsg);
-        message.delete();
     }
 }
 

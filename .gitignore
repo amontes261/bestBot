@@ -14,7 +14,6 @@ Data_Management/
 Procfile
 
 #Miscallaneous
-package-lock.json
 Ideas.txt
 embed_commands.txt
 .DS_Store

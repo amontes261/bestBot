@@ -1,5 +1,28 @@
 
-function rpsSwitch(message, Discord, msgSplit, errFile){
+///////////////////////////////////////////////////////
+//// rockpaperscissors.js – JavaScript x DiscordJS ////
+//// Alex Montes  ––––––––––––––  @a.montes28#4501 ////
+///////////////////////////////////////////////////////
+
+function rpsSwitch(message, Discord, fs, msgSplit, errFile, client){
+
+/* - Function rpsSwitch() was designed to ONLY be called from file main.js
+
+    - Small, cosmetic command – usable on any server
+
+    - Was designed to be triggered via command: !rps
+
+    - Try !rps help to have the bot to provide a usage message */
+    
+    var data;
+    try { // Attempt to read "database" JSON file //
+        data = JSON.parse(fs.readFileSync("Data_Management/rpsData.json"));
+    }
+    catch (e) {
+        errFile.unexpectedErr(message, Discord, msgSplit, "rps", client);
+        return;
+    }
+
     if (msgSplit.length == 1){
         var result = parseInt( Math.random() * 3 , 10);
 
@@ -28,9 +51,94 @@ function rpsSwitch(message, Discord, msgSplit, errFile){
         }
         
         message.channel.send(embeddedMsg);
-        message.delete();
     }
-    else if (msgSplit.length == 2){
+    else if (msgSplit.length == 2 && msgSplit[1] == 'scoreboard'){
+        const embeddedMsg = new Discord.MessageEmbed();
+        if (!data["Guilds"].hasOwnProperty(message.guild.id)) { // Case: Guild never registered into database //
+            const embeddedMsg = new Discord.MessageEmbed()
+                .setColor('C80000') // red
+                .setTitle('Scoreboard Unavailable') 
+                .setDescription('There is no **rps** data available for this server.')
+                .setTimestamp()
+                .setFooter(`Failed rps scoreboard by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+            message.channel.send(embeddedMsg);
+            return;
+        }
+        else{
+            var leaderboard = [];
+
+            for (var user in data["Guilds"][message.guild.id]["Users"]){
+                var ctr = 0;
+                if (leaderboard.length == 0)
+                    leaderboard.push(user);
+                else{
+                    while(ctr != leaderboard.length){
+                        if (data["Guilds"][message.guild.id]["Users"][leaderboard[ctr]]['Longest Winstreak'] < data["Guilds"][message.guild.id]["Users"][user]['Longest Winstreak']){
+                            leaderboard.splice(ctr, 0, user);
+                            break;
+                        }
+                        else if(data["Guilds"][message.guild.id]["Users"][leaderboard[ctr]]['Longest Winstreak'] == data["Guilds"][message.guild.id]["Users"][user]['Longest Winstreak']){
+                            if (data["Guilds"][message.guild.id]["Users"][leaderboard[ctr]]["Display Name"] > data["Guilds"][message.guild.id]["Users"][user]["Display Name"]){
+                                leaderboard.splice(ctr, 0, user);
+                                break;
+                            }
+                        }
+                        else if (ctr == (leaderboard.length - 1) ){
+                            leaderboard.splice(ctr + 1, 0, user);
+                            break;
+                        }
+                        ctr++;
+                    }
+                }
+            }
+
+            var topFiveNames = '';
+            var topFiveStreaks = '';
+            var topFivePlayed = '';
+
+            var showLimit = 10;
+            if (leaderboard.length < showLimit){
+                showLimit = leaderboard.length;
+            }
+            for(var i = 0; i < showLimit; i++){
+                if (i == showLimit - 1){
+                    topFiveNames += data["Guilds"][message.guild.id]["Users"][leaderboard[i]]["Display Name"]
+                    topFiveStreaks += data["Guilds"][message.guild.id]["Users"][leaderboard[i]]["Longest Winstreak"]
+                    topFivePlayed += data["Guilds"][message.guild.id]["Users"][leaderboard[i]]["Games Played"]
+                }
+                else{
+                    topFiveNames += data["Guilds"][message.guild.id]["Users"][leaderboard[i]]["Display Name"] + "\n"
+                    topFiveStreaks += data["Guilds"][message.guild.id]["Users"][leaderboard[i]]["Longest Winstreak"] + "\n"
+                    topFivePlayed += data["Guilds"][message.guild.id]["Users"][leaderboard[i]]["Games Played"] + "\n"
+                }
+            }
+          
+              const embed = new Discord.MessageEmbed()
+                .setAuthor(`RPS Leaderboard for ${message.guild.name}`, message.guild.iconURL())
+                .setColor('00CBFF') // baby blue
+                .addFields({ name: 'Display Name', value: topFiveNames, inline: true },
+                  { name: 'Longest Streak', value: topFiveStreaks, inline: true },
+                  { name: 'Games Played', value: topFivePlayed, inline: true } )
+                .setTimestamp()
+                .setFooter(`Rock, paper, scissors scoreboard summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+            embeddedMsg.setColor('C80000') // red
+            embeddedMsg.setTitle('**bruh**');
+
+            embeddedMsg.addFields(
+                { name: '**Simulate a turn of rock paper scissors**', value: '!rps', inline: false },
+                { name: '**Play a game of rock paper scissors against me**', value: '!rps <rock, paper or scissors>', inline: false },
+                { name: '**Show the server scoreboard**', value: '!rps scoreboard', inline: false }
+            )
+
+            embeddedMsg.setTimestamp()
+            embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+            message.channel.send(embed);
+        }
+    }
+    else if (msgSplit.length == 2 && msgSplit[1] != 'help'){
         if (msgSplit[1] != 'rock' && msgSplit[1] != 'paper' && msgSplit[1] != 'scissors'){
             errFile.rps(message, Discord);
             return;
@@ -59,20 +167,22 @@ function rpsSwitch(message, Discord, msgSplit, errFile){
         }
 
         var outcome = determineWinner(computerSelection, msgSplit[1]); // 0 on author win, 1 on author loss, 2 on draw
+        storeData(message, fs, computerSelection, msgSplit[1], message.author.id, data, outcome);
 
         if (outcome == -1){
-            errFile.unexpectedErr(message, msgSplit);
+            errFile.unexpectedErr(message, Discord, msgSplit, "rps", client);
             return;
         }
         if (outcome == 0){
+
             embeddedMsg.setColor('00C500') // green
             embeddedMsg.setTitle('You Win');
-            embeddedMsg.setDescription(`My selection was **${computerSelection}**, but your selection was **${msgSplit[1]}**.`);
+            embeddedMsg.setDescription(`My selection was **${computerSelection}**, but your selection was **${msgSplit[1]}**.\nYour winstreak: ${data["Guilds"][message.guild.id]["Users"][message.author.id]["Current Winstreak"]}\nYour longest winstreak: ${data["Guilds"][message.guild.id]["Users"][message.author.id]["Longest Winstreak"]}`);
         }
         else if (outcome == 1){
             embeddedMsg.setColor('C80000') // red
             embeddedMsg.setTitle('You Lose');
-            embeddedMsg.setDescription(`Your selection was **${msgSplit[1]}**, but my selection was **${computerSelection}**.`);
+            embeddedMsg.setDescription(`Your selection was **${msgSplit[1]}**, but my selection was **${computerSelection}**.\nYour longest winstreak: ${data["Guilds"][message.guild.id]["Users"][message.author.id]["Longest Winstreak"]}`);
         }
         else{
             embeddedMsg.setColor('EFEF00') // yellow
@@ -80,7 +190,6 @@ function rpsSwitch(message, Discord, msgSplit, errFile){
             embeddedMsg.setDescription(`It's a draw. We both selected **${msgSplit[1]}**.`);
         }
         message.channel.send(embeddedMsg);
-        message.delete();
     }
     else{
         errFile.rps(message, Discord);
@@ -111,6 +220,56 @@ function determineWinner(computerSelection, authorSelection){
     }
     else
         return -1;
+}
+
+function storeData(message, fs, computerSelection, authorSelection, authorID, data, gameOutcome){
+    if (!data["Guilds"].hasOwnProperty(message.guild.id)) { // Case: Guild never registered into database //
+        data["Guilds"][message.guild.id] = {
+            "Server Name": message.guild.name,
+            "Users": {}
+        }
+        data["Guilds"][message.guild.id]["Users"][authorID] = {
+            "Display Name" : message.guild.members.cache.get(authorID).displayName,
+            "Current Winstreak" : 0,
+            "Longest Winstreak": 0,
+            "Number of Rock Picks": 0,
+            "Number of Paper Picks": 0,
+            "Number of Scissors Picks": 0,
+            "Games Played": 0
+        }
+
+    }
+    else if (!data["Guilds"][message.guild.id]["Users"].hasOwnProperty(authorID)) { // Case: Author never registered into database //
+        data["Guilds"][message.guild.id]["Users"][authorID] = {
+            "Display Name" : message.guild.members.cache.get(authorID).displayName,
+            "Current Winstreak" : 0,
+            "Longest Winstreak": 0,
+            "Number of Rock Picks": 0,
+            "Number of Paper Picks": 0,
+            "Number of Scissors Picks": 0,
+            "Games Played": 0
+        }
+    }
+    
+    data["Guilds"][message.guild.id]["Users"][authorID]["Games Played"]++;
+
+    if (authorSelection == 'rock')
+        data["Guilds"][message.guild.id]["Users"][authorID]["Number of Rock Picks"]++;
+    else if (authorSelection == 'paper')
+        data["Guilds"][message.guild.id]["Users"][authorID]["Number of Paper Picks"]++;
+    else if (authorSelection == 'scissors')
+        data["Guilds"][message.guild.id]["Users"][authorID]["Number of Scissors Picks"]++;
+
+    if (gameOutcome == 0){
+        data["Guilds"][message.guild.id]["Users"][authorID]["Current Winstreak"]++;
+        if (data["Guilds"][message.guild.id]["Users"][authorID]["Current Winstreak"] > data["Guilds"][message.guild.id]["Users"][authorID]["Longest Winstreak"])
+            data["Guilds"][message.guild.id]["Users"][authorID]["Longest Winstreak"] = data["Guilds"][message.guild.id]["Users"][authorID]["Current Winstreak"];
+    }
+    else if (gameOutcome == 1)
+        data["Guilds"][message.guild.id]["Users"][authorID]["Current Winstreak"] = 0;
+
+    fs.writeFileSync('Data_Management/rpsData.json', JSON.stringify(data));
+    // Shouldn't fail if it's already gotten this far //
 }
 
 

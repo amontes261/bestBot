@@ -1,19 +1,48 @@
 
+////////////////////////////////////////////
+//// poll.js – JavaScript x DiscordJS //////
+//// Alex Montes ––– @a.montes28#4501 //////
+////////////////////////////////////////////
+
 function pollSwitch(message, msgSplit, Discord, errFile){
+
+ /* - Function pollSwitch() was designed to ONLY be called from file main.js
+
+    - Poll creator command – usable on any server
+
+    - Was designed to be triggered via command: !poll
+
+    - Try !poll help to have the bot to provide a usage message */
+    
+    errFile.disabled(message, Discord, 'poll');
+    return;
+
+
     var selections = [];
-    var pollTitle = "A poll";
+    var pollTitle = `${message.guild.members.cache.get(message.author.id).displayName}'s Poll`;
 
     if (msgSplit.length == 1){
-        errFile.poll(message);
+        errFile.poll(message, Discord);
         return;
     }
-    else if (msgSplit.length == 2){
-        errFile.poll(message);
+    else if (msgSplit.length == 2 && msgSplit[1][0] == '['){
+        const embeddedMsg = new Discord.MessageEmbed()
+            .setColor('C80000') // red
+            .setTitle(`Poll Creation Failed`)
+            .setDescription(`Come on. A poll with only one option?\nAdd more options to create a poll.\nTry __!poll help__ for usage help.`)
+            .setTimestamp()
+            .setFooter(`Poll requested by ${message.guild.members.cache.get(message.author.id).displayName}`);
+        message.channel.send(embeddedMsg);
         return;
     }
     else if (msgSplit.length == 3){
-        message.channel.send(`<@${message.author.id}> come on. A poll with ONE selection??`)
-        errFile.poll(message);
+        const embeddedMsg = new Discord.MessageEmbed()
+            .setColor('C80000') // red
+            .setTitle(`Poll Creation Failed`)
+            .setDescription(`Come on. A poll with only one option?\nAdd more options to create a poll.\nTry __!poll help__ for usage help.`)
+            .setTimestamp()
+            .setFooter(`Poll requested by ${message.guild.members.cache.get(message.author.id).displayName}`);
+        message.channel.send(embeddedMsg);
         return;
     }
     else{
@@ -27,37 +56,30 @@ function pollSwitch(message, msgSplit, Discord, errFile){
                 if (msgSplit[i][0] == '[' && msgSplit[i][msgSplit[i].length - 1] == ']'){
                     newWord = newWord + msgSplit[i];
                     done = true;
-                    //console.log("reached3");
                 }
                 else if (msgSplit[i][0] == '{' && msgSplit[i][msgSplit[i].length - 1] == '}'){
                     newWord = newWord + msgSplit[i];
                     done = true;
                     isTitle = true;
-                    //console.log("reached4");
                 }
                 else if (msgSplit[i][0] == '['){
                     newWord = newWord + msgSplit[i] + ' ';
                     started = true;
-                    //console.log("reached1");
                 }
                 else if (msgSplit[i][0] == '{'){
                     newWord = newWord + msgSplit[i] + ' ';
                     started = true;
                     isTitle = true;
-                    //console.log("reached2");
                 }
                 else if (msgSplit[i][msgSplit[i].length - 1] == ']' || msgSplit[i][msgSplit[i].length - 1] == '}'){
                     newWord = newWord + msgSplit[i];
                     done = true;
-                    //console.log("reached5");
                 }
                 else if (started){
                     newWord = newWord + msgSplit[i] + ' ';
-                    //console.log("reached6");
                 }
                 else if (!started){
-                    console.log("failed at !started");
-                    errFile.poll(message);
+                    errFile.poll(message, Discord);
                     return;
                 }
                 i++
@@ -80,8 +102,6 @@ function pollSwitch(message, msgSplit, Discord, errFile){
         return;
     }
 
-    //console.log(selections);
-    //console.log(selections.length);
     pollTitle = pollTitle[1].toUpperCase() + pollTitle.substring(2, pollTitle.length - 1);
 
     const reply = new Discord.MessageEmbed()
