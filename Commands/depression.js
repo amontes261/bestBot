@@ -15,11 +15,14 @@ async function depressionSwitch(message, Discord, msgSplit, errFile, client){
     - Try !amongus help to have the bot to provide a usage message */
 
     if (message.guild.id != '404413479915880448'){ // Ensure not running on a 3rd party server //
-        errFile.onlyOnChromozone(message, Discord, "depression");
         return;
     }
     else if( !message.guild.members.cache.get(message.author.id).roles.member._roles.includes('758827953781080125') ){ // Case: User does not have the 'quad' role //
         errFile.permissionDeniedRole(message, Discord, 'depression', 'quad');
+        return;
+    }
+    else if (!message.guild.me.hasPermission("MOVE_MEMBERS") || !message.guild.me.hasPermission("CONNECT") || !message.guild.me.hasPermission("SPEAK") ){
+        errFile.missingPermissions(message, Discord, "depression");
         return;
     }
     else if (message.member.voice.channelID == null) { // Case: User not in voice channel //

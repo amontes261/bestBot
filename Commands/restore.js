@@ -15,7 +15,11 @@ function restoreSwitch(message, Discord, fs, msgSplit, errFile, client) {
     - Try !restore help to have the bot to provide a usage message */
 
     if (message.guild.id != '404413479915880448') { // Ensure not running on a 3rd party server //
-        errFile.onlyOnChromozone(message, Discord, "restore");
+        return;
+    }
+
+    if (!message.guild.me.hasPermission("MANAGE_NICKNAMES") || !message.guild.me.hasPermission("MANAGE_ROLES") ){
+        errFile.missingPermissions(message, Discord, "restore");
         return;
     }
 
@@ -69,21 +73,28 @@ function runRestoreCmd(message, Discord, fs, data, id) {
         message.channel.send(embeddedMsg);
         return;
     }
-    if (data["Guilds"][message.guild.id]["Users"].hasOwnProperty(id)) {
-        message.guild.members.cache.get(id).setNickname(data["Guilds"][message.guild.id]["Users"][id]["Display Name"]);
+    if (data["Guilds"][message.guild.id]["Users"].hasOwnProperty(id)) { // Execute restore //
+        // Set Display Name //
+        if (message.guild.members.cache.get(id).displayName != data["Guilds"][message.guild.id]["Users"][id]["Display Name"])
+            message.guild.members.cache.get(id).setNickname(data["Guilds"][message.guild.id]["Users"][id]["Display Name"]);
+
+        // Remove Un-Approved Role //
+        if (!data["Guilds"][message.guild.id]["Users"][id]["Roles"].includes("759960911682732042") )
+            message.guild.members.cache.get(id).roles.remove("759960911682732042");
 
         var missingRoles = 0;
         data["Guilds"][message.guild.id]["Users"][id]["Roles"].forEach((userRole) => {
             var roleMissing = true;
             message.guild.roles.cache.forEach((guildRole) => {
-                if (userRole == guildRole)
+                if (userRole == guildRole.id){
+                    if (!message.guild.members.cache.get(id).roles.cache.has(userRole) )
+                        message.guild.members.cache.get(id).roles.add(userRole); // Add if user doesn't already have the role //
                     roleMissing = false;
+                }
             })
 
             if (roleMissing)
-                missingRoles++;
-            else if (!message.guild.members.cache.get(id).roles.member._roles.includes(userRole)) // User already has role
-                message.guild.members.cache.get(id).roles.add(userRole).catch(missingRoles++);
+                missingRoles++;                
         })
 
         if (missingRoles == 0){
@@ -103,14 +114,14 @@ function runRestoreCmd(message, Discord, fs, data, id) {
         else if (missingRoles == data["Guilds"][message.guild.id]["Users"][id]["Roles"].length){
             const embeddedMsg = new Discord.MessageEmbed()
                 .setColor('C80000') // red
-                .setTitle('Display Name Restored, Roles Failed')
+                .setTitle('Display Name Restored, All Roles Failed')
                 .setTimestamp()
                 .setFooter(`Restore requested by ${message.guild.members.cache.get(message.author.id).displayName}`);
 
             if (message.author.id == id)
-                embeddedMsg.setDescription(`Your display name has been restored. However, there was a problem restoring **all** of your roles.`)
+                embeddedMsg.setDescription(`Your display name has been restored. However, there was a problem restoring **all** of your roles.\nThis means that **all** roles you *had* when you were registered into the restore database were either deleted or not found. Try **!restore register** to re-register your roles.`)
             else
-                embeddedMsg.setDescription(`Display name for ${message.guild.members.cache.get(id).displayName} has been restored. However, there was a problem restoring **all** roles for ${message.guild.members.cache.get(id).displayName}..`)
+                embeddedMsg.setDescription(`Display name for ${message.guild.members.cache.get(id).displayName} has been restored. However, there was a problem restoring **all** roles for ${message.guild.members.cache.get(id).displayName}.\nThis means all roles this user *had* when they were registered into the restore database were either deleted or not found. Try **!restore register <Tag them>** to re-register their roles.`)
 
             message.channel.send(embeddedMsg);
             return;
@@ -123,9 +134,9 @@ function runRestoreCmd(message, Discord, fs, data, id) {
                 .setFooter(`Restore requested by ${message.guild.members.cache.get(message.author.id).displayName}`);
 
             if (message.author.id == id)
-                embeddedMsg.setDescription(`Your display name has been restored. However, one or more roles was unable to be restored.`)
+                embeddedMsg.setDescription(`Your display name has been restored. However, one or more roles was unable to be restored.\nThis means one or more roles that you *had* when you were registered into the restore database was either deleted or not found. Try **!restore register** to re-register your roles.`)
             else
-                embeddedMsg.setDescription(`The display name for ${message.guild.members.cache.get(id).displayName} has been restored. However, one or more roles for ${message.guild.members.cache.get(id).displayName} was unable to be restored.`)
+                embeddedMsg.setDescription(`The display name for ${message.guild.members.cache.get(id).displayName} has been restored. However, one or more roles for ${message.guild.members.cache.get(id).displayName} was unable to be restored.\nThis means one or more roles that this user *had* when they were registered into the restore database was either deleted or not found. Try **!restore register <Tag them>** to re-register their roles.`)
             message.channel.send(embeddedMsg);
             return;
         }

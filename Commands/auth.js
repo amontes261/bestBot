@@ -290,7 +290,7 @@ async function authSwitch(message, Discord, fs, msgSplit, errFile, client){
                                         var clientLogChannel = message.guild.channels.cache.get("772647489798537236");
                                         const deAuthLogMsg = new Discord.MessageEmbed()
                                             .setColor('00C500') // green 
-                                            .setTitle(`User ${message.guild.name} De-Authorized`)
+                                            .setTitle(`User ${message.mentions.members.first().displayName} De-Authorized`)
                                             .setTimestamp()
                                             .setFooter(`De-Authorized by ${message.guild.members.cache.get(message.author.id).displayName}`)
                                         clientLogChannel.send(deAuthLogMsg);

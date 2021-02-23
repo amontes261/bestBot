@@ -24,6 +24,11 @@ async function inviteSwitch(message, Discord, msgSplit, errFile){
         message.channel.send(embeddedMsg);
     }
     else if (msgSplit.length == 2){ 
+        if (!message.guild.me.hasPermission("CREATE_INSTANT_INVITE") ){
+            errFile.missingPermissions(message, Discord, "invite");
+            return;
+        }
+
         const embeddedMsg = new Discord.MessageEmbed()
             .setTimestamp()
         if (msgSplit[1] == "help") // Command usage message requested //

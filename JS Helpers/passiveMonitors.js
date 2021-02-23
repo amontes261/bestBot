@@ -1,7 +1,34 @@
 const { ConditionalNodeDependencies } = require("mathjs");
 
 function assertActivity(client){
-	client.user.setActivity('over 25 cmds: use !help');
+	client.user.setActivity('so many cmds || !help');
+}
+
+function blockKenbotClip(message, Discord, msgSplit){
+	if (msgSplit.length <= 3){
+		if (msgSplit[0] != 'gasp' || msgSplit[1] != 'clip')
+			return;
+		else{
+			if (msgSplit.includes('alex_sus') ){
+
+				const embeddedMsg = new Discord.MessageEmbed();
+				var counter = 0;
+				
+				while (counter != 100000 || message.guild.members.cache.get("770766611929366551").voice.channelID != null){
+					counter++;
+				}
+				message.guild.member('770766611929366551').voice.setChannel(null);
+
+				embeddedMsg.setColor('C80000') // red
+				embeddedMsg.setTitle('**Cap Clip Detected**');
+				embeddedMsg.setDescription(`A **cap clip** has been detected. Cap clips are clips that express fake news.\n${message.guild.members.cache.get("770766611929366551").displayName} has been disconnected to avoid the presence of a cap clip.`);
+				embeddedMsg.setTimestamp();
+				embeddedMsg.setFooter(`Fake news clip requested from ${message.guild.members.cache.get(message.author.id).displayName}`);
+				message.channel.send(embeddedMsg);
+				message.delete();
+			}
+		}
+	}
 }
 
 function containsGay(message, msgSplit){
@@ -69,9 +96,9 @@ function filterSayCommand(message, msgSplit){
 	var hasBot = false;
 
 	msgSplit.forEach((word) => {
-		if (word.indexOf("alex") != -1 || word.indexOf("403355889253220352") != -1)
+		if (word.indexOf("alex") != -1 || word.indexOf("403355889253220352") != -1 || word.indexOf("@lex") != -1)
 			hasAlex = true;
-		if (word.indexOf("gay") != -1)
+		if (word.indexOf("gay") != -1 || word.indexOf("g@y") != -1 || word.indexOf("gei") != -1 || word.indexOf("gae") != -1)
 			hasGay = true;
 		if (word.indexOf("bad") != -1)
 			hasBad = true;
@@ -117,5 +144,13 @@ function onewordChecks(message, msgSplit){
 	return false;
 }
 
+function ttsChatReminder(message, msgSplit){
+	if (msgSplit.length != 3)
+		return;
+	if (msgSplit[0] == 'gasp' && msgSplit[1] == 'say' && msgSplit[2] == 'tts'){
+		
+	}
+}
 
-module.exports = { assertActivity, containsGay, containsLmao, deleteVincentBruh, ensureCorrectMemberCount, filterSayCommand, onewordChecks };
+
+module.exports = { assertActivity, blockKenbotClip, containsGay, containsLmao, deleteVincentBruh, ensureCorrectMemberCount, filterSayCommand, onewordChecks, ttsChatReminder };

@@ -13,6 +13,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "google": "^2.1.0",
     "mathjs": "^8.0.1",
+    "scrape-yt": "^1.4.8",
     "winston": "^3.3.3",
     "ytdl-core": "^4.0.5"
   },

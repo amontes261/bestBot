@@ -30,8 +30,10 @@ function picSwitch(message, Discord, fs, msgSplit, errFile, client){
         return;
         
     if (msgSplit.length == 2){
-        if (msgSplit[1].length == 22 && message.mentions.members.size != 0) // Execute send photo commandd //
-            showRandPic(message, Discord, fs, msgSplit, errFile, client, message.mentions.members.first().user.id);
+		if (msgSplit[1] == 'random')
+			errFile.missingNewFeature(message, Discord, "pic random");
+        else if (msgSplit[1].length == 22 && message.mentions.members.size != 0) // Execute send photo commandd //
+            showRandUserPic(message, Discord, fs, msgSplit, errFile, client, message.mentions.members.first().user.id);
         else // Command usage message requested OR Incorrect command usage message //
 			errFile.pic(message, Discord);
     }
@@ -42,7 +44,7 @@ function picSwitch(message, Discord, fs, msgSplit, errFile, client){
 		errFile.pic(message, Discord);
 }
 
-function showRandPic(message, Discord, fs, msgSplit, errFile, client, id){
+function showRandUserPic(message, Discord, fs, msgSplit, errFile, client, id){
 	try{
 		var userExists = false;
 		const allFiles = fs.readdirSync("./Pics");

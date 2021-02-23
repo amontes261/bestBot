@@ -19,6 +19,11 @@ function banSwitch(message, Discord, fs, msgSplit, errFile){
         return;
     }
 
+    if (!message.guild.me.hasPermission("BAN_MEMBERS") ){
+        errFile.missingPermissions(message, Discord, "ban");
+        return;
+    }
+
     if (msgSplit.length == 2){
         if (msgSplit[1] == "help"){ // Command usage message requested //
             errFile.ban(message, Discord);
@@ -100,6 +105,11 @@ function kickSwitch(message, Discord, fs, msgSplit, errFile){
         return;
     }
 
+    if (!message.guild.me.hasPermission("KICK_MEMBERS")){
+        errFile.missingPermissions(message, Discord, "kick");
+        return;
+    }
+
     if (msgSplit.length == 2){
         if (msgSplit[1] == "help"){ // Command usage message requested //
             errFile.kick(message, Discord);
@@ -178,6 +188,11 @@ async function unbanSwitch(message, Discord, fs, msgSplit, errFile, client){
         
     if(!hasPermission(message, fs) ){
         errFile.permissionDenied(message, Discord, "unban")
+        return;
+    }
+    
+    if (!message.guild.me.hasPermission("BAN_MEMBERS") ){
+        errFile.missingPermissions(message, Discord, "unban");
         return;
     }
 

@@ -17,7 +17,11 @@ function amongusSwitch(message, Discord, msgSplit, errFile){
     - Try !amongus help to have the bot to provide a usage message */
  
     if (message.guild.id != '404413479915880448'){ // Ensure not running on a 3rd party server //
-        errFile.onlyOnChromozone(message, Discord, "amongus");
+        return;
+    }
+
+    if (!message.guild.me.hasPermission("MUTE_MEMBERS") || !message.guild.me.hasPermission("DEAFEN_MEMBERS") || !message.guild.me.hasPermission("MOVE_MEMBERS")){
+        errFile.missingPermissions(message, Discord, "amongus");
         return;
     }
 

@@ -29,6 +29,11 @@ async function earrapeSwitch(message, Discord, fs, msgSplit, errFile, client){
 	if (!allCommandsUnlocked) // Ignore command entirely if server is not authorized to use it //
         return;
 
+    if (!message.guild.me.hasPermission("CONNECT") || !message.guild.me.hasPermission("SPEAK") ){
+        errFile.missingPermissions(message, Discord, "earrape");
+        return;
+    }
+    
     if (msgSplit.length == 1)
         errFile.earrape(message, Discord);
     else if (msgSplit.length == 2 && msgSplit[1] == 'help')

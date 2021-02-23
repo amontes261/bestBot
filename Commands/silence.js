@@ -33,7 +33,7 @@ function silenceSwitch(message, Discord, fs, msgSplit, errFile, client){
     
     
         if (!userAuthorized && !isMaster){ // Ensure user has proper permission to use this command //
-            errFile.permissionDenied(message, Discord, "isolate");
+            errFile.permissionDenied(message, Discord, "silence");
             return;
         }
 
@@ -43,7 +43,7 @@ function silenceSwitch(message, Discord, fs, msgSplit, errFile, client){
         }
 
         const embeddedMsg = new Discord.MessageEmbed().setTimestamp()
-        if (message.mentions.members.size != 0){
+        if (msgSplit[1].length == 22 && message.mentions.members.size != 0){
             if (message.guild.members.cache.get(message.mentions.members.first().user.id).voice.channelID == null){
                 embeddedMsg.setColor('C80000'); // red
                 embeddedMsg.setTitle(`Unable to silence ${message.guild.members.cache.get(message.mentions.members.first().user.id).displayName}`);

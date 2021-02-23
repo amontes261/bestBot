@@ -22,23 +22,28 @@ function help(message, Discord, fs){
                       "**!ban** - Ban a user\n" +
                       "**!chegg** - Provide a search query and get a link that'll search the query on Chegg\n" +
                       "**!coinflip** - Flip a coin\n" +
+                      "**!deaf** - Toggle server deafen on a user\n" +
                       "**!feedback** - Provide feedback regarding bestBot\n" +
                       "**!google** - Provide a search query and get a link that'll search the query on Google\n" +
+                      "**!id** - Get the ID of a User, a Channel or a Server \n" +
                       "**!invite** - Get a link to invite this bot to a server or links to different types of server-based invites \n" +
                       "**!isolate** - Toggle server deafen and server mute on a user\n" +
                       "**!kick** - Kick a user\n" +
                       "**!math** - Enter a math problem for the bot to solve\n" +
+                      "**!nick** - Change the nickname of you or another user \n" +
+                      "**!pause** - Pause any audio that bestBot is playing\n" +
                       "**!ping** - Check if the bot's online/check this server's response time\n" +
                       "**!play** - Play any audio from YouTube\n" +
                       "**!poll** - Construct and issue a poll in a text channel\n" +
-                      "**!repo** - Get a link to the GitHub repository housing all the files required by bestBot\n" +
+                      "**!repo** - Get a link to the GitHub repository housing *most of* the files required by bestBot\n" +
                       "**!rps** - Play a game of rock paper scissors against bestBot\n" +
                       "**!say** - Have bestBot say a provided phrase\n" +
                       "**!shutdown** - Shut down bestBot (Only Authorized Users)\n" +
                       "**!silence** - Toggle server mute on a user\n" +
                       "**!stop** - Stop any audio that bestBot is playing & leave a voice channel\n" +
                       "**!summon** - Summon a user/get a user's attention\n" +
-                      "**!unban** - Unban a user\n"
+                      "**!unban** - Unban a user\n" +
+                      "**!volume** - Play any audio from YouTube\n"
 
     if (allCommandsUnlocked){
         description += "\n__Special Commands__\n" +
@@ -197,6 +202,21 @@ function daysSince(message, Discord){
     message.channel.send(embeddedMsg);
 }
 
+function deaf(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!deaf Command Usage:**');
+
+    embeddedMsg.addFields(
+        { name: '**Toggle server deafen for a user**', value: '!deaf <Tag a User>' }
+    )
+
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
 function earrape(message, Discord){
     const embeddedMsg = new Discord.MessageEmbed();
     embeddedMsg.setColor('C80000') // red
@@ -265,6 +285,26 @@ function google(message, Discord){
     message.channel.send(embeddedMsg);
 }
 
+function id(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!id Command Usage:**');
+
+    embeddedMsg.addFields(
+        { name: '**Get your Discord User ID**', value: '!id' },
+        { name: "**Get another user's Discord User ID**", value: '!id <Tag a User>' },
+        { name: '**Get the Discord ID of a channel**', value: '!id channel' },
+        { name: '**Get the Discord ID of a specified channel**', value: '!id channel <Channel Name>' },
+        { name: '**Get the Discord ID of this Discord Server**', value: '!id server' },
+
+    )
+
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
 function invite(message, Discord){
     const embeddedMsg = new Discord.MessageEmbed();
     embeddedMsg.setColor('C80000') // red
@@ -316,10 +356,56 @@ function kick(message, Discord){
 function math(message, Discord){
     const embeddedMsg = new Discord.MessageEmbed();
     embeddedMsg.setColor('C80000') // red
-    embeddedMsg.setTitle('**!math Command Usage:**');
+    embeddedMsg.setTitle('**!nick Command Usage:**');
     embeddedMsg.setDescription('**NOTE:**\nThis math command only recognizes the symbols ( ) + - * / ^')
     embeddedMsg.addFields(
         { name: '**Do a simple math equation**', value: '!math <Equation>' }
+    )
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
+function nick(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!nick Command Usage:**');
+    
+    embeddedMsg.addFields(
+        { name: '**Set your own nickname/display name on the server**', value: '!nick <New name>' },
+        { name: "**Set another user's nickname/display name on the server**", value: '!kick <Tag a User> <New name>' }
+    )
+
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
+function nowPlaying(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!nowplaying Command Usage:**');
+    
+    embeddedMsg.addFields(
+        { name: '**Bring up the playing media UI**', value: '!nowplaying' },
+        { name: "**Set another user's nickname/display name on the server**", value: '!kick <Tag a User> <New name>' }
+    )
+
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
+function pause(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!pause Command Usage:**');
+
+    embeddedMsg.addFields(
+        { name: "**Pause whatever's playing:**", value: '!pause' }
     )
 
     embeddedMsg.setTimestamp()
@@ -335,6 +421,7 @@ function pic(message, Discord){
 
     embeddedMsg.addFields(
         { name: '**Send a random picture of a person:**', value: '!pic <Tag a User>' },
+        { name: '**Send a random picture of anyone in the database:**', value: '!pic random' },
         { name: '**Upload a picture of a person**', value: '!pic upload <Tag a User>' }
     )
 
@@ -365,7 +452,9 @@ function play(message, Discord){
     embeddedMsg.setTitle('**!play Command Usage:**');
 
     embeddedMsg.addFields(
-        { name: '**This has not been coded yet.:**', value: '!play !' }
+        { name: '**Resume if player is paused:**', value: '!play' },
+        { name: '**Play the audio from a video from YouTube:**', value: '!play <YouTube Link>' },
+        { name: '**Search YouTube for a video to play the audio from:**', value: '!play <Search Query>' }
     )
 
     embeddedMsg.setTimestamp()
@@ -470,6 +559,21 @@ function silence(message, Discord){
     message.channel.send(embeddedMsg);
 }
 
+function stop(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!stop Command Usage:**');
+
+    embeddedMsg.addFields(
+        { name: "**Stop any audio that bestBot is playing & leave a voice channel:**", value: '!stop' }
+    )
+
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
 function summon(message, Discord){
     const embeddedMsg = new Discord.MessageEmbed();
     embeddedMsg.setColor('C80000') // red
@@ -505,6 +609,22 @@ function unban(message, Discord){
             { name: '**Unban a user by username ***AND*** discriminator**', value: '!unban <Enter a Username with its Discriminator>' }
         )
     }
+
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
+function volume(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!volume Command Usage:**');
+
+    embeddedMsg.addFields(
+        { name: '**Get the current volume of any playing media**', value: '!volume' },
+        { name: '**Change the volume of any playing media**', value: '!volume <0-200>' }
+    )
 
     embeddedMsg.setTimestamp()
     embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
@@ -685,8 +805,8 @@ function missingPermissions(message, Discord, command){
 module.exports = { 
     
     //usage msg exports:
-    help, amongus, auth, avatar, ban, chegg, clip, coinflip, daysSince, earrape, feedback, gay, google, invite, isolate, kick,
-    math, pic, ping, play, poll, repo, restore, role, rps, silence, summon, unban, 
+    help, amongus, auth, avatar, ban, chegg, clip, coinflip, daysSince, deaf, earrape, feedback, gay, google, id, invite,
+    isolate, kick, math, nowPlaying, nick, pause, pic, ping, play, poll, repo, restore, role, rps, silence, stop, summon, unban, volume,
     
     // invalid argument msg exports:
     nocmd, tagSecondArg, tagSecondArgServer, tagThirdArg, generalArgProblem, secondArgProblem, thirdArgProblem, fourthArgProblem, invalidCmd,

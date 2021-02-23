@@ -5,8 +5,10 @@ const Discord = require('discord.js')
 const client = new Discord.Client()
 const fs = require("fs"); // filesystem
 let login = JSON.parse(fs.readFileSync('Data_Management/loginToken.json')).token;
-const youtube = require('ytdl-core');
+const youtubeDL = require('ytdl-core');
+const youtubeScraper = require("scrape-yt");
 const math = require('mathjs');
+const musicDatabase = new Map();
 
 // ============= //
 // FILE READ-INS //
@@ -14,35 +16,38 @@ const math = require('mathjs');
 const errFile = require('./JS\ Helpers/errMessages.js');
 const passive = require('./JS\ Helpers/passiveMonitors.js');
 
-const gayCmd = require('./Commands/gay.js');
-const depressionCmd = require('./Commands/depression.js');
-const pollCmd = require('./Commands/poll.js');
-const picCmd = require('./Commands/pic.js');
-const clipCmd = require('./Commands/clip.js');
-const summonCmd = require('./Commands/summon.js');
-const dayssinceCmd = require('./Commands/dayssince.js');
-const coinflipCmd = require('./Commands/coinflip.js');
-const googleCmd = require('./Commands/google.js');
-const shutdownCmd = require('./Commands/shutdown.js');
 const amongusCmd = require('./Commands/amongus.js');
-const sayCmd = require('./Commands/say.js');
-const silenceCmd = require('./Commands/silence.js');
-const isolateCmd = require('./Commands/isolate.js');
-const avatarCmd = require('./Commands/avatar.js');
-const pingCmd = require('./Commands/ping.js');
-const roleCmd = require('./Commands/role.js');
-const inviteCmd = require('./Commands/invite.js');
-const earrapeCmd = require('./Commands/earrape.js');
-const playCmd = require('./Commands/play.js');
-const feedbackCmd = require('./Commands/feedback.js');
-const mathCmd = require('./Commands/math.js');
-const rpsCmd = require('./Commands/rockpaperscissors.js');
-const moderationCmds = require('./Commands/moderation.js');
-const restartCmd = require('./Commands/restart.js');
 const authCmd = require('./Commands/auth.js');
-const repoCmd = require('./Commands/repo.js');
+const avatarCmd = require('./Commands/avatar.js');
 const cheggCmd = require('./Commands/chegg.js');
+const clipCmd = require('./Commands/clip.js');
+const coinflipCmd = require('./Commands/coinflip.js');
+const dayssinceCmd = require('./Commands/dayssince.js');
+const deafCmd = require('./Commands/deaf.js');
+const depressionCmd = require('./Commands/depression.js');
+const earrapeCmd = require('./Commands/earrape.js');
+const feedbackCmd = require('./Commands/feedback.js');
+const gayCmd = require('./Commands/gay.js');
+const googleCmd = require('./Commands/google.js');
+const idCmd = require('./Commands/id.js');
+const inviteCmd = require('./Commands/invite.js');
+const isolateCmd = require('./Commands/isolate.js');
+const mathCmd = require('./Commands/math.js');
+const mediaControlCmds = require('./Commands/mediaControl.js');
+const moderationCmds = require('./Commands/moderation.js');
+const nickCmd = require('./Commands/nick.js');
+const picCmd = require('./Commands/pic.js');
+const pingCmd = require('./Commands/ping.js');
+const pollCmd = require('./Commands/poll.js');
+const repoCmd = require('./Commands/repo.js');
+const restartCmd = require('./Commands/restart.js');
 const restoreCmd = require('./Commands/restore.js');
+const roleCmd = require('./Commands/role.js');
+const rpsCmd = require('./Commands/rockpaperscissors.js');
+const sayCmd = require('./Commands/say.js');
+const shutdownCmd = require('./Commands/shutdown.js');
+const silenceCmd = require('./Commands/silence.js');
+const summonCmd = require('./Commands/summon.js');
 
 // ===========================================================
 // CLIENT ON: READY
@@ -68,24 +73,43 @@ client.on('ready', () => {
 		clientLogChannel.send(logStartupMsg);
 	}
 
-	client.user.setActivity('over 25 cmds: use !help');
+	client.user.setActivity('so many cmds || !help');
 
 	// ======================== //
 	// STREAM LAUNCH TO CONSOLE //
-	// ======================== //\
+	// ======================== //
 	console.log("\n==============================");
 	console.log("bestBot is now online.\n")
 
 	let numServers = client.guilds.cache.size;
 	if (numServers == 1)
-		console.log(`Running on ${numServers} server:`);
+		console.log(`Deployed on ${numServers} server:`);
 	else
-		console.log(`Running on ${numServers} servers:`);
+		console.log(`Deployed on ${numServers} servers:`);
 
 	client.guilds.cache.forEach((guild) => {
-		console.log(' •' + guild.name);
+		console.log(' • ' + guild.name);
 	})
 	console.log("==============================");
+
+	// ========================= //
+	// PREPARE MUSIC FEATURE MAP //
+	// ========================= //
+
+	client.guilds.cache.forEach((guild) => {
+		const queueEntry = {
+			mostRecentTextChannel: null,
+			activeVoiceChannel: null,
+			activeConnection: null,
+			activeDispatcher: null,
+			songQueue: [],
+			volume: 100,
+			nowPlayingMessageID: null,
+			playing: false
+		};
+
+		musicDatabase.set(guild.id, queueEntry);
+	})
 })
 
 // ===========================================================
@@ -137,6 +161,21 @@ client.on("guildMemberRemove", function(member){
 	client.guilds.cache.get(chromozoneID).channels.cache.get(memberCountChannelID).setName(`Members: ${numMembers}`);
 });
 
+client.on("messageUpdate", function(oldMsg, newMsg){
+	if (newMsg.content.split(' ').length != 0){
+		var msgSplitUndefined = newMsg.content.split(' ');
+		var msgSplitUpper = msgSplitUndefined.filter(word => word != undefined);
+		var msgSplit = [];
+		msgSplitUpper.forEach((word) => {
+			msgSplit.push(word.toLowerCase() );
+		})
+		passive.containsGay(newMsg, msgSplit);
+		passive.filterSayCommand(newMsg, msgSplit);
+	}
+	else
+		return;
+});
+
 
 // ===========================================================
 // CLIENT ON: MESSAGE GETS SENT
@@ -163,6 +202,7 @@ client.on('message', async message => {
 
 	if (message.author.bot) return;
 		// PASSIVE CHECKS (DOES NOT check bot messages) //
+		passive.blockKenbotClip(message, Discord, msgSplit);
 		passive.containsGay(message, msgSplit);
 		passive.containsLmao(message, msgSplit);
 		passive.ensureCorrectMemberCount(message);
@@ -236,6 +276,12 @@ client.on('message', async message => {
 
 					// ==================================== //
 					// ==================================== //
+					case "deaf":
+						deafCmd.deafSwitch(message, Discord, fs, msgSplit, errFile, client);
+					break;
+
+					// ==================================== //
+					// ==================================== //
 					case "depression":
 						depressionCmd.depressionSwitch(message, Discord, msgSplit, errFile, client);
 					break;
@@ -253,11 +299,7 @@ client.on('message', async message => {
 					break;
 
 					case "focs":
-						var output = 0;
-						for (var i = 1; i <= 20000000; i++){
-							output += (1/i);
-						}
-						message.channel.send(output);
+						runFocsCmd(message);
 					break;
 
 					// ==================================== //
@@ -278,6 +320,12 @@ client.on('message', async message => {
 						errFile.help(message, Discord, fs);
 					break;
 
+					// ==================================== //
+					// ==================================== //
+					case "id":
+						idCmd.idSwitch(message, Discord, fs, msgSplit, errFile);
+					break;
+					
 					// ==================================== //
 					// ==================================== //
 					case "invite":
@@ -304,6 +352,24 @@ client.on('message', async message => {
 
 					// ==================================== //
 					// ==================================== //
+					case "nick":
+						nickCmd.nickSwitch(message, Discord, fs, msgSplit, errFile);
+					break;
+
+					// ==================================== //
+					// ==================================== //
+					case "nowplaying":
+						mediaControlCmds.nowPlayingSwitch(message, Discord, msgSplit, errFile, musicDatabase, client);
+					break;
+
+					// ==================================== //
+					// ==================================== //
+					case "pause":
+						mediaControlCmds.pauseSwitch(message, Discord, msgSplit, errFile, musicDatabase, client);
+					break;
+					
+					// ==================================== //
+					// ==================================== //
 					case "pic":
 						picCmd.picSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
@@ -317,7 +383,7 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "play":
-						playCmd.playSwitch(message, Discord, msgSplit, errFile, client, youtube);
+						mediaControlCmds.playSwitch(message, Discord, msgSplit, msgSplitUpper, errFile, client, youtubeDL, youtubeScraper, musicDatabase);
 					break;
 
 					// ==================================== //
@@ -376,10 +442,14 @@ client.on('message', async message => {
 
 					// ==================================== //
 					// ==================================== //
+					case "skip":
+						mediaControlCmds.skipSwitch(message, Discord, msgSplit, errFile, youtubeDL, musicDatabase, client);
+					break;
+
+					// ==================================== //
+					// ==================================== //
 					case "stop":
-						errFile.missingNewFeature(message, Discord);
-						return;
-						Discord.StreamDispatcher.destroy();
+						mediaControlCmds.stopSwitch(message, Discord, msgSplit, errFile, musicDatabase, client);
 					break;
 
 					// ==================================== //
@@ -394,6 +464,12 @@ client.on('message', async message => {
 						moderationCmds.unbanSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
+					// ==================================== //
+					// ==================================== //
+					case "volume":
+						mediaControlCmds.volumeSwitch(message, Discord, msgSplit, errFile, musicDatabase, client);
+					break;
+
 					
 
 
@@ -402,8 +478,9 @@ client.on('message', async message => {
 
 			} // end else statement determining that !bitch is followed with command
 			//client.channels.cache.get(channelID).send("Pong");
-
+			
 		}
+		
 })
 
 
@@ -411,6 +488,15 @@ client.on('message', async message => {
 // BEGIN HELPER FUNCTIONS FOR ABOVE MAIN
 // ===========================================================
 
+function runFocsCmd(message){
+	var total = 50000;
+	for (var i = 0; i < 7; i++){
+		total *= 1.005
+		total -= 1000
+		
+		message.channel.send(`Total after P ${i + 1}: ${total}`);
+	}
+}
 
 
 client.login(login);
