@@ -8,7 +8,10 @@ let login = JSON.parse(fs.readFileSync('Data_Management/loginToken.json')).token
 const youtubeDL = require('ytdl-core');
 const youtubeScraper = require("scrape-yt");
 const math = require('mathjs');
-const musicDatabase = new Map();
+const tts = require('google-tts-api');
+
+const mediaData = new Map();
+const ttsData = new Map();
 
 // ============= //
 // FILE READ-INS //
@@ -48,6 +51,7 @@ const sayCmd = require('./Commands/say.js');
 const shutdownCmd = require('./Commands/shutdown.js');
 const silenceCmd = require('./Commands/silence.js');
 const summonCmd = require('./Commands/summon.js');
+const ttsCmd = require('./Commands/tts.js');
 
 // ===========================================================
 // CLIENT ON: READY
@@ -93,22 +97,34 @@ client.on('ready', () => {
 	console.log("==============================");
 
 	// ========================= //
-	// PREPARE MUSIC FEATURE MAP //
+	// PREPARE MEDIA FEATURE MAP //
 	// ========================= //
 
 	client.guilds.cache.forEach((guild) => {
-		const queueEntry = {
+		const mediaDataEntry = {
 			mostRecentTextChannel: null,
 			activeVoiceChannel: null,
 			activeConnection: null,
 			activeDispatcher: null,
 			songQueue: [],
+			clipQueue: [],
 			volume: 100,
 			nowPlayingMessageID: null,
-			playing: false
+			playingMusic: false,
+			playingClip: false,
+			mediaPlaybackType: null
+		};
+		
+		const ttsDataEntry = {
+			enabled: false,
+			groupTTS: false,
+			targetTTSChannel: null,
+			sentenceQueue: [],
+			targetUser: null,
 		};
 
-		musicDatabase.set(guild.id, queueEntry);
+		mediaData.set(guild.id, mediaDataEntry);
+		ttsData.set(guild.id, ttsDataEntry);
 	})
 })
 
@@ -176,12 +192,40 @@ client.on("messageUpdate", function(oldMsg, newMsg){
 		return;
 });
 
+client.on("voiceStateUpdate", function(oldState, newState){
+	if (newState.id == "502354442054664192"){ // client either joined or disconnected //
+		if(newState.channelID == null){ // client disconnected //
+			if (mediaData.get(newState.guild.id)['activeDispatcher'] != null)
+				mediaData.get(newState.guild.id)['activeDispatcher'].destroy();
+			
+			// Clear playback media data //
+			mediaData.get(newState.guild.id)['activeConnection'] = null;
+			mediaData.get(newState.guild.id)['activeVoiceChannel'] = null;
+			mediaData.get(newState.guild.id)['activeDispatcher'] = null;
+			mediaData.get(newState.guild.id)['songQueue'] = [];
+			mediaData.get(newState.guild.id)['clipQueue'] = [];
+			mediaData.get(newState.guild.id)['nowPlayingMessageID'] = null;
+			mediaData.get(newState.guild.id)["playingMusic"] = false;
+			mediaData.get(newState.guild.id)["playingClip"] = false;
+			mediaData.get(newState.guild.id)["mediaPlaybackType"] = null;
+
+			// Clear stored TTS data //
+			ttsData.get(newState.guild.id)['enabled'] = false;
+			ttsData.get(newState.guild.id)['groupTTS'] = false;
+			ttsData.get(newState.guild.id)['targetTTSChannel'] = null;
+			ttsData.get(newState.guild.id)['sentenceQueue'] = [];
+			ttsData.get(newState.guild.id)['targetUser'] = null;
+		}
+	}
+});
+
 
 // ===========================================================
 // CLIENT ON: MESSAGE GETS SENT
 // ===========================================================
 
 client.on('message', async message => {
+	//console.log(mediaData.get(message.guild.id)['activeDispatcher']);
 	// client.guilds.cache.get("404413479915880448").members.cache.get("403355889253220352").send(`test`);
 	
 	// SPLIT UP MESSAGE INTO ARRAY //
@@ -208,9 +252,10 @@ client.on('message', async message => {
 		passive.ensureCorrectMemberCount(message);
 		if (passive.filterSayCommand(message, msgSplit) ) return;
 		if (passive.onewordChecks(message, msgSplit) ) return;
+		passive.ttsMonitor(message, msgSplit, mediaData, ttsData, tts);
 		
 
-		else if (msgSplit[0][0] == '!'){
+		if (msgSplit[0][0] == '!'){
 			// console.log(msgSplit.length);
 			//console.log(message);
 			if (msgSplit[0].length == 1){
@@ -259,7 +304,7 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "clip":
-						clipCmd.clipSwitch(message, Discord, fs, msgSplit, errFile, client);
+						clipCmd.clipSwitch(message, Discord, fs, msgSplit, errFile, mediaData, client);
 					break;
 
 					// ==================================== //
@@ -359,13 +404,13 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "nowplaying":
-						mediaControlCmds.nowPlayingSwitch(message, Discord, msgSplit, errFile, musicDatabase, client);
+						mediaControlCmds.nowPlayingSwitch(message, Discord, msgSplit, errFile, mediaData, client);
 					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "pause":
-						mediaControlCmds.pauseSwitch(message, Discord, msgSplit, errFile, musicDatabase, client);
+						mediaControlCmds.pauseSwitch(message, Discord, msgSplit, errFile, mediaData, client);
 					break;
 					
 					// ==================================== //
@@ -383,7 +428,7 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "play":
-						mediaControlCmds.playSwitch(message, Discord, msgSplit, msgSplitUpper, errFile, client, youtubeDL, youtubeScraper, musicDatabase);
+						mediaControlCmds.playSwitch(message, Discord, fs, msgSplit, msgSplitUpper, errFile, client, youtubeDL, youtubeScraper, mediaData);
 					break;
 
 					// ==================================== //
@@ -443,19 +488,25 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "skip":
-						mediaControlCmds.skipSwitch(message, Discord, msgSplit, errFile, youtubeDL, musicDatabase, client);
+						mediaControlCmds.skipSwitch(message, Discord, msgSplit, errFile, youtubeDL, mediaData, client);
 					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "stop":
-						mediaControlCmds.stopSwitch(message, Discord, msgSplit, errFile, musicDatabase, client);
+						mediaControlCmds.stopSwitch(message, Discord, msgSplit, errFile, mediaData, ttsData, client);
 					break;
 
 					// ==================================== //
 					// ==================================== //
 					case "summon":
 						summonCmd.summonSwitch(message, Discord, msgSplit, errFile);
+					break;
+
+					// ==================================== //
+					// ==================================== //
+					case "tts":
+						ttsCmd.ttsSwitch(message, Discord, msgSplit, errFile, tts, mediaData, ttsData);
 					break;
 
 					// ==================================== //
@@ -467,7 +518,7 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "volume":
-						mediaControlCmds.volumeSwitch(message, Discord, msgSplit, errFile, musicDatabase, client);
+						mediaControlCmds.volumeSwitch(message, Discord, msgSplit, errFile, mediaData, client);
 					break;
 
 					
@@ -489,13 +540,20 @@ client.on('message', async message => {
 // ===========================================================
 
 function runFocsCmd(message){
-	var total = 50000;
-	for (var i = 0; i < 7; i++){
-		total *= 1.005
-		total -= 1000
-		
-		message.channel.send(`Total after P ${i + 1}: ${total}`);
+	if (message.author.id != "403355889253220352")
+		return;
+	
+	var CSVreturn = ""
+	for (var n = 2; n < 25; n++){
+		var ans = 0;
+		for (var i = 0; i <= n; i++){
+			for (var j = 0; j <= i; j++){
+				ans += (i * Math.pow(2, j) );
+			}
+		}
+		CSVreturn += `${ans},`
 	}
+	message.channel.send(CSVreturn);
 }
 
 

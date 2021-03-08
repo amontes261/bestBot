@@ -1,4 +1,3 @@
-const { ConditionalNodeDependencies } = require("mathjs");
 
 function assertActivity(client){
 	client.user.setActivity('so many cmds || !help');
@@ -87,6 +86,7 @@ function ensureCorrectMemberCount(message){
 }
 
 function filterSayCommand(message, msgSplit){
+	if (message.content.includes('Help menu')) return;
 	if (msgSplit[0] == '!role' || msgSplit[0] == '!gay')
 		return false;
 	
@@ -144,13 +144,86 @@ function onewordChecks(message, msgSplit){
 	return false;
 }
 
-function ttsChatReminder(message, msgSplit){
-	if (msgSplit.length != 3)
+function ttsMonitor(message, msgSplit, mediaData, ttsData, ttsAPI){
+	// Will never activate for bot messages, already checks in main.js //
+	if (!ttsData.get(message.guild.id)["enabled"])
 		return;
-	if (msgSplit[0] == 'gasp' && msgSplit[1] == 'say' && msgSplit[2] == 'tts'){
+	else if (ttsData.get(message.guild.id)["targetTTSChannel"] != null && message.channel.id != ttsData.get(message.guild.id)["targetTTSChannel"])
+		return;
+	else if ( (ttsData.get(message.guild.id)["targetUser"] != null && message.author.id != ttsData.get(message.guild.id)["targetUser"]) && !ttsData.get(message.guild.id)["groupTTS"])
+		return;
+	else if (msgSplit[0][0] == "!")
+		return;
+
+	var sentence = "";
+	var containsLink = false;
+	var containsTag = message.mentions.members.size >= 1;
+	for (var i = 0; i < msgSplit.length; i++){
+		if (msgSplit[i].includes("http") || msgSplit[i].includes("www.") )
+			containsLink = true;
+	}
+	if (containsLink)
+		sentence = `${message.guild.members.cache.get(message.author.id).displayName} sent a link.`
+	else if (containsTag){
+		sentence = `${message.guild.members.cache.get(message.author.id).displayName} tagged ${message.guild.members.cache.get(message.mentions.members.first().user.id).displayName}.` 
+	}
+	else{
+		if (ttsData.get(message.guild.id)["groupTTS"]){
+			sentence = `${message.guild.members.cache.get(message.author.id).displayName} said `
+		}
+		for (var i = 0; i < msgSplit.length; i++){ // Resolve Requested Title Name
+			sentence += msgSplit[i];
+			if (i != msgSplit.length - 1)
+			  sentence += ' ';
+		}
+	}
+	ttsData.get(message.guild.id)["sentenceQueue"].push(sentence); // add sentence to queue
+
+	if (ttsData.get(message.guild.id)["sentenceQueue"].length == 1){ //say it and look for rest to say
+		var sentenceAudio = ttsAPI.getAudioUrl(sentence, {
+            lang: 'en-US',
+            slow: false,
+            host: 'https://translate.google.com',
+        });
+
+		dispatcher = mediaData.get(message.guild.id)['activeConnection'].play(sentenceAudio, {
+            volume: mediaData.get(message.guild.id)['volume'] / 100,
+          });
+        mediaData.get(message.guild.id)['activeDispatcher'] = dispatcher;
+		ttsData.get(message.guild.id)['sentenceQueue'].shift()
 		
+		dispatcher.on('finish', () => {
+			if (ttsData.get(message.guild.id)['sentenceQueue'].length != 0)
+				sentenceQueueShift(message, msgSplit, mediaData, ttsData, ttsAPI);
+		});
+	}
+	else{
+		ttsData.get(message.guild.id).sentenceQueue.push(sentence); // add sentence to queue
 	}
 }
 
+////////////////////////////
+// HELPER FUNCTIONS BELOW //
+////////////////////////////
 
-module.exports = { assertActivity, blockKenbotClip, containsGay, containsLmao, deleteVincentBruh, ensureCorrectMemberCount, filterSayCommand, onewordChecks, ttsChatReminder };
+function sentenceQueueShift(message, msgSplit, mediaData, ttsData, ttsAPI){
+	var sentenceAudio = ttsAPI.getAudioUrl(ttsData.get(message.guild.id)['sentenceQueue'][0], {
+		lang: 'en-US',
+		slow: false,
+		host: 'https://translate.google.com',
+	});
+	ttsData.get(message.guild.id)['sentenceQueue'].shift()
+
+	dispatcher = mediaData.get(message.guild.id)['activeConnection'].play(sentenceAudio, {
+		volume: mediaData.get(message.guild.id)['volume'] / 100,
+	  });
+	mediaData.get(message.guild.id)['activeDispatcher'] = dispatcher;
+  
+	dispatcher.on('finish', () => {
+	if (ttsData.get(message.guild.id)['sentenceQueue'].length != 0)
+		sentenceQueueShift(message, msgSplit, mediaData, ttsData, ttsAPI);
+	});
+}
+
+
+module.exports = { assertActivity, blockKenbotClip, containsGay, containsLmao, deleteVincentBruh, ensureCorrectMemberCount, filterSayCommand, onewordChecks, ttsMonitor };

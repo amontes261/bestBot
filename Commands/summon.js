@@ -14,6 +14,9 @@ async function summonSwitch(message, Discord, msgSplit, errFile){
 
     - Try !summon help to have the bot to provide a usage message */
 
+    errFile.disabled(message, Discord, "summon");
+    return;
+    
     const embeddedMsg = new Discord.MessageEmbed();
     if (msgSplit.length == 1){
         errFile.summon(message, Discord);
@@ -108,7 +111,7 @@ async function summonSwitch(message, Discord, msgSplit, errFile){
             }
             else if (!isNaN(msgSplit[2]) && msgSplit[2] > 0){
                 
-                if (msgSplit[3] > 5){
+                if (msgSplit[2] > 5){
                     embeddedMsg.setTitle(`Summon Failed`)
                     embeddedMsg.setColor('C80000') // red
                     embeddedMsg.setDescription(`The number of pings you've entered is too high.\nThe maximum number of pings allowed is 5.`)
@@ -146,6 +149,8 @@ async function summonSwitch(message, Discord, msgSplit, errFile){
                 for (var i = 0; i < msgSplit[2] - 1; i++)
                     await message.channel.send(`<@${message.mentions.members.first().user.id}>`).then(msg => {msg.delete()})
             }
+            else
+                errFile.summon(message, Discord);
         }
     }
     else if (msgSplit.length == 4){
@@ -154,7 +159,7 @@ async function summonSwitch(message, Discord, msgSplit, errFile){
             return;
         }
         
-        if (msgSplit[3] > 5){
+        if (msgSplit[2] > 5){
             embeddedMsg.setTitle(`DM Summon Failed`)
             embeddedMsg.setColor('C80000') // red
             embeddedMsg.setDescription(`The number of pings you've entered is too high.\nThe maximum number of pings allowed is 5.`)

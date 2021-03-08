@@ -21,6 +21,7 @@ function help(message, Discord, fs){
                       "**!avatar** - Get a picture of a user's avatar\n" +
                       "**!ban** - Ban a user\n" +
                       "**!chegg** - Provide a search query and get a link that'll search the query on Chegg\n" +
+                      "**!clip** - Play an audio clip\n" +
                       "**!coinflip** - Flip a coin\n" +
                       "**!deaf** - Toggle server deafen on a user\n" +
                       "**!feedback** - Provide feedback regarding bestBot\n" +
@@ -47,7 +48,6 @@ function help(message, Discord, fs){
 
     if (allCommandsUnlocked){
         description += "\n__Special Commands__\n" +
-                       "**!clip** - Play a (probably funny or weird) audio clip\n" +
                        "**!dayssince** - List how many days it's been since a user's had sex\n" +        
                        "**!earrape** - Play an extremely loud audio clip\n" +
                        "**!pic** - Send a random (probably funny) photo of a user\n"
@@ -592,6 +592,24 @@ function summon(message, Discord){
     message.channel.send(embeddedMsg);
 }
 
+function tts(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!tts Command Usage:**');
+
+    embeddedMsg.addFields(
+        { name: '**Start a personal text-to-speech session that reads out anything you write in a text channel**', value: '!tts start' },
+        { name: '**Stop any active text-to-speech session**', value: '!tts stop' },
+        { name: '**Start a text-to-speech session among all users in a text channel**', value: '!tts group' },
+        { name: '**Write something for the bot to read out**', value: '!tts <Sentence>' }
+    )
+
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
 function unban(message, Discord){
     const embeddedMsg = new Discord.MessageEmbed();
     embeddedMsg.setColor('C80000') // red
@@ -806,7 +824,7 @@ module.exports = {
     
     //usage msg exports:
     help, amongus, auth, avatar, ban, chegg, clip, coinflip, daysSince, deaf, earrape, feedback, gay, google, id, invite,
-    isolate, kick, math, nowPlaying, nick, pause, pic, ping, play, poll, repo, restore, role, rps, silence, stop, summon, unban, volume,
+    isolate, kick, math, nowPlaying, nick, pause, pic, ping, play, poll, repo, restore, role, rps, silence, stop, summon, tts, unban, volume,
     
     // invalid argument msg exports:
     nocmd, tagSecondArg, tagSecondArgServer, tagThirdArg, generalArgProblem, secondArgProblem, thirdArgProblem, fourthArgProblem, invalidCmd,
