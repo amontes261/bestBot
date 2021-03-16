@@ -30,6 +30,23 @@ function blockKenbotClip(message, Discord, msgSplit){
 	}
 }
 
+function codeMessage(message, msgSplit){
+	if (message.guild.id != '404413479915880448') // Ensure this only operates for 1st Party server //
+		return;
+	var codeMsg = false;
+	msgSplit.forEach((word) => {
+		if(word.includes('```python') || word.includes('```java') || word.includes('```js') || word.includes('```cpp')){
+			codeMsg = true
+		}
+	})
+
+	if (!codeMsg || message.channel.id == '759972672955219979')
+		return;
+
+	if (message.channel.parent.id == '758827372525912104') // Quad Category //
+		message.channel.send(`<@${message.author.id}>  || *Please consider pasting large chunks of code in the* <#759972672955219979> *channel (for better organization).*`)
+}
+
 function containsGay(message, msgSplit){
 	if (msgSplit[0] == '!role' || msgSplit[0] == '!gay')
 		return;
@@ -226,4 +243,4 @@ function sentenceQueueShift(message, msgSplit, mediaData, ttsData, ttsAPI){
 }
 
 
-module.exports = { assertActivity, blockKenbotClip, containsGay, containsLmao, deleteVincentBruh, ensureCorrectMemberCount, filterSayCommand, onewordChecks, ttsMonitor };
+module.exports = { assertActivity, blockKenbotClip, codeMessage, containsGay, containsLmao, deleteVincentBruh, ensureCorrectMemberCount, filterSayCommand, onewordChecks, ttsMonitor };

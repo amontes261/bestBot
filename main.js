@@ -247,6 +247,7 @@ client.on('message', async message => {
 	if (message.author.bot) return;
 		// PASSIVE CHECKS (DOES NOT check bot messages) //
 		passive.blockKenbotClip(message, Discord, msgSplit);
+		passive.codeMessage(message, msgSplit);
 		passive.containsGay(message, msgSplit);
 		passive.containsLmao(message, msgSplit);
 		passive.ensureCorrectMemberCount(message);
