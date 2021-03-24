@@ -1,4 +1,4 @@
-## .gitIgnore for mookBot ##
+## .gitIgnore for bestBot ##
 
 #Media Directories
 node_modules/
@@ -17,3 +17,4 @@ Procfile
 Ideas.txt
 embed_commands.txt
 .DS_Store
+Logo_Files/.DS_Store

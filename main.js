@@ -35,6 +35,7 @@ const googleCmd = require('./Commands/google.js');
 const idCmd = require('./Commands/id.js');
 const inviteCmd = require('./Commands/invite.js');
 const isolateCmd = require('./Commands/isolate.js');
+const leaveCmd = require('./Commands/leave.js')
 const mathCmd = require('./Commands/math.js');
 const mediaControlCmds = require('./Commands/mediaControl.js');
 const moderationCmds = require('./Commands/moderation.js');
@@ -388,6 +389,12 @@ client.on('message', async message => {
 					// ==================================== //
 					case "kick":
 						moderationCmds.kickSwitch(message, Discord, fs, msgSplit, errFile);
+					break;
+
+					// ==================================== //
+					// ==================================== //
+					case "leave":
+						leaveCmd.leaveSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //

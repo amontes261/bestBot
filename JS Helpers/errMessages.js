@@ -30,6 +30,7 @@ function help(message, Discord, fs){
                       "**!invite** - Get a link to invite this bot to a server or links to different types of server-based invites \n" +
                       "**!isolate** - Toggle server deafen and server mute on a user\n" +
                       "**!kick** - Kick a user\n" +
+                      "**!leave** - Have the bot leave this server\n" +
                       "**!math** - Enter a math problem for the bot to solve\n" +
                       "**!nick** - Change the nickname of you or another user \n" +
                       "**!pause** - Pause any audio that bestBot is playing\n" +
@@ -346,6 +347,20 @@ function kick(message, Discord){
     embeddedMsg.addFields(
         { name: '**Kick a user from the server**', value: '!kick <Tag a User>' },
         { name: '**Kick a user from the sevrer and provide a reason**', value: '!kick <Tag a User> <reason>' }
+    )
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
+function leave(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!leave Command Usage:**');
+
+    embeddedMsg.addFields(
+        { name: '**Have the bot leave this server**', value: '!leave' }
     )
     embeddedMsg.setTimestamp()
     embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
@@ -824,7 +839,7 @@ module.exports = {
     
     //usage msg exports:
     help, amongus, auth, avatar, ban, chegg, clip, coinflip, daysSince, deaf, earrape, feedback, gay, google, id, invite,
-    isolate, kick, math, nowPlaying, nick, pause, pic, ping, play, poll, repo, restore, role, rps, silence, stop, summon, tts, unban, volume,
+    isolate, kick, leave, math, nowPlaying, nick, pause, pic, ping, play, poll, repo, restore, role, rps, silence, stop, summon, tts, unban, volume,
     
     // invalid argument msg exports:
     nocmd, tagSecondArg, tagSecondArgServer, tagThirdArg, generalArgProblem, secondArgProblem, thirdArgProblem, fourthArgProblem, invalidCmd,
