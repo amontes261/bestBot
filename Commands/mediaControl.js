@@ -556,7 +556,7 @@ async function stopSwitch(message, Discord, msgSplit, errFile, mediaData, ttsDat
         ttsData.get(message.guild.id)['sentenceQueue'] = [];
         ttsData.get(message.guild.id)['targetUser'] = null;
 
-        embeddedMsg.setColor('00C500'); // green
+        embeddedMsg.setColor('A724A8'); // dark purple
         embeddedMsg.setTitle(`Stopping All Media...`);
         embeddedMsg.setFooter(`Media stopped by ${message.guild.members.cache.get(message.author.id).displayName}`);
         message.channel.send(embeddedMsg);

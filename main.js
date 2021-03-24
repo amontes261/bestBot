@@ -218,6 +218,34 @@ client.on("voiceStateUpdate", function(oldState, newState){
 			ttsData.get(newState.guild.id)['targetUser'] = null;
 		}
 	}
+
+	if (ttsData.get(newState.guild.id)['enabled']){
+		if (ttsData.get(newState.guild.id)["targetUser"] == newState.id){
+			if(newState.channelID == null){ // TTS User Disconnected //
+				const embeddedMsg = new Discord.MessageEmbed().setTimestamp()
+				embeddedMsg.setColor('A724A8'); // dark purple
+				embeddedMsg.setTitle(`Disconnecting TTS Session`);
+				embeddedMsg.setDescription(`The target TTS user has disconnected from the voice channel.`);
+				embeddedMsg.setFooter(`Automatically disconnected`);
+			
+				newState.guild.channels.cache.get(ttsData.get(newState.guild.id)['targetTTSChannel']).send(embeddedMsg);
+
+				// Clear playback media data //
+				if (mediaData.get(newState.guild.id)['activeDispatcher'] != null)
+					mediaData.get(newState.guild.id)['activeDispatcher'].destroy();
+
+				if (mediaData.get(newState.guild.id)['activeConnection'] != null)
+					mediaData.get(newState.guild.id)['activeConnection'].disconnect();
+
+				// Clear stored TTS data //
+				ttsData.get(newState.guild.id)['enabled'] = false;
+				ttsData.get(newState.guild.id)['groupTTS'] = false;
+				ttsData.get(newState.guild.id)['targetTTSChannel'] = null;
+				ttsData.get(newState.guild.id)['sentenceQueue'] = [];
+				ttsData.get(newState.guild.id)['targetUser'] = null;
+			}
+		}
+	}
 });
 
 

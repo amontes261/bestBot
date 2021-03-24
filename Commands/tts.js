@@ -4,8 +4,6 @@
 //// Alex Montes  –––  @a.montes28#4501 ////
 ////////////////////////////////////////////
 
-const { MessageFlags } = require("discord.js");
-
 async function ttsSwitch(message, Discord, msgSplit, errFile, ttsAPI, mediaData, ttsData){
 
 /* - Function ttsSwitch() was designed to ONLY be called from file main.js
@@ -36,6 +34,14 @@ async function ttsSwitch(message, Discord, msgSplit, errFile, ttsAPI, mediaData,
             embeddedMsg.setTitle(`TTS Session Already Active`);
             embeddedMsg.setDescription(`There is already an active Text to Speech session.\nUse command *!tts stop* to end the current session before starting a new one.`);
             embeddedMsg.setFooter(`Failed TTS start command from ${message.guild.members.cache.get(message.author.id).displayName}`);
+            message.channel.send(embeddedMsg);
+            return;
+        }
+        else if (message.member.voice.channelID == null){
+            embeddedMsg.setColor('C80000'); // red
+            embeddedMsg.setTitle(`TTS Session Unavailable`);
+            embeddedMsg.setDescription(`You must be in a voice channel to start a TTS session`);
+            embeddedMsg.setFooter(`Failed TTS session request by ${message.guild.members.cache.get(message.author.id).displayName}`);
             message.channel.send(embeddedMsg);
             return;
         }
