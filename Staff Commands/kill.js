@@ -37,7 +37,6 @@ async function killSwitch(message, Discord, fs, msgSplit, errFile, client){
                 .setFooter(`Runtime killed by ${message.guild.members.cache.get(message.author.id).displayName}`);
 
             await message.channel.send(killMsg);
-            await message.delete();
 
             var chromozone = client.guilds.cache.get("404413479915880448");
             if (chromozone != undefined && chromozone != null){

@@ -62,15 +62,25 @@ const statusCmd = require('./Staff\ Commands/status.js');
 // ===========================================================
 
 client.on('ready', () => {
+	var chromozoneID = "404413479915880448";
 	var chromozone = client.guilds.cache.get("404413479915880448");
 	
 	// =========================== //
 	// CHROMOZONE RELATED COMMANDS //
 	// =========================== //
-	if (chromozone != undefined && chromozone != null){
-		var memberCountChannel = chromozone.channels.cache.get("759968169015902249");
-		var numMembers = chromozone.memberCount;
-		memberCountChannel.setName(`Members: ${numMembers}`);
+	if (client.guilds.cache.get(chromozoneID) != undefined && client.guilds.cache.get(chromozoneID) != null){
+
+		var totalCountChannelID = "759968169015902249";
+		var memberCountChannelID = "839622921303621662";
+		var botCountChannelID = "839622833721573416";
+		var serverRegionChannelID = "839622957936148501";
+
+		var numMembers = client.guilds.cache.get(chromozoneID).memberCount;
+
+		client.guilds.cache.get(chromozoneID).channels.cache.get(totalCountChannelID).setName(`‣ Total Users: ${numMembers}`);
+		client.guilds.cache.get(chromozoneID).channels.cache.get(memberCountChannelID).setName(`‣ Member Count: ${client.guilds.cache.get(chromozoneID).members.cache.filter(m => !m.user.bot).size}`);
+		client.guilds.cache.get(chromozoneID).channels.cache.get(botCountChannelID).setName(`‣ Bot Count: ${client.guilds.cache.get(chromozoneID).members.cache.filter(m => m.user.bot).size}`);
+		client.guilds.cache.get(chromozoneID).channels.cache.get(serverRegionChannelID).setName(`‣ Server Region: ${client.guilds.cache.get(chromozoneID).region}`);
 		
 		var clientLogChannel = chromozone.channels.cache.get("772647489798537236");
 		const logStartupMsg = new Discord.MessageEmbed()
@@ -142,7 +152,10 @@ client.on("guildMemberAdd", function(member){
 		return;
 
 	var dashboardID = "759971676418605066";
-	var memberCountChannelID = "759968169015902249";
+	var totalCountChannelID = "759968169015902249";
+	var memberCountChannelID = "839622921303621662";
+	var botCountChannelID = "839622833721573416";
+	var serverRegionChannelID = "839622957936148501";
 	
 	if (member.user.bot)
 		member.roles.add("759959255083384872"); // BOT role
@@ -157,7 +170,10 @@ client.on("guildMemberAdd", function(member){
 	else
 		client.guilds.cache.get(chromozoneID).channels.cache.get(dashboardID).send(`Member <@${member.id}> has joined the server. There are now ${numMembers} server members.`)
 
-	client.guilds.cache.get(chromozoneID).channels.cache.get(memberCountChannelID).setName(`Members: ${numMembers}`);
+	client.guilds.cache.get(chromozoneID).channels.cache.get(totalCountChannelID).setName(`‣ Total Users: ${numMembers}`);
+	client.guilds.cache.get(chromozoneID).channels.cache.get(memberCountChannelID).setName(`‣ Member Count: ${member.guild.members.cache.filter(m => !m.user.bot).size}`);
+	client.guilds.cache.get(chromozoneID).channels.cache.get(botCountChannelID).setName(`‣ Bot Count: ${member.guild.members.cache.filter(m => m.user.bot).size}`);
+	client.guilds.cache.get(chromozoneID).channels.cache.get(serverRegionChannelID).setName(`‣ Server Region: ${member.guild.region}`);
 });
 
 // ===========================================================
@@ -170,7 +186,10 @@ client.on("guildMemberRemove", function(member){
 		return;
 	
 	var dashboardID = "759971676418605066";
-	var memberCountChannelID = "759968169015902249";
+	var totalCountChannelID = "759968169015902249";
+	var memberCountChannelID = "839622921303621662";
+	var botCountChannelID = "839622833721573416";
+	var serverRegionChannelID = "839622957936148501";
 	
 	var numMembers = client.guilds.cache.get(chromozoneID).memberCount;
 	if (member.user.bot)
@@ -178,7 +197,10 @@ client.on("guildMemberRemove", function(member){
 	else
 		client.guilds.cache.get(chromozoneID).channels.cache.get(dashboardID).send(`Member **@${member.user.tag.substring(0, member.user.tag.length - 5)}** has left or been removed from the server. There are now ${numMembers} members remaining.`)
 
-	client.guilds.cache.get(chromozoneID).channels.cache.get(memberCountChannelID).setName(`Members: ${numMembers}`);
+	client.guilds.cache.get(chromozoneID).channels.cache.get(totalCountChannelID).setName(`‣ Total Users: ${numMembers}`);
+	client.guilds.cache.get(chromozoneID).channels.cache.get(memberCountChannelID).setName(`‣ Member Count: ${member.guild.members.cache.filter(m => !m.user.bot).size}`);
+	client.guilds.cache.get(chromozoneID).channels.cache.get(botCountChannelID).setName(`‣ Bot Count: ${member.guild.members.cache.filter(m => m.user.bot).size}`);
+	client.guilds.cache.get(chromozoneID).channels.cache.get(serverRegionChannelID).setName(`‣ Server Region: ${member.guild.region}`);
 });
 
 client.on("messageUpdate", function(oldMsg, newMsg){
