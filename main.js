@@ -53,6 +53,7 @@ const silenceCmd = require('./Commands/silence.js');
 const summonCmd = require('./Commands/summon.js');
 const ttsCmd = require('./Commands/tts.js');
 
+const killCmd = require('./Staff\ Commands/kill.js');
 const shutdownCmd = require('./Staff\ Commands/shutdown.js');
 const statusCmd = require('./Staff\ Commands/status.js');
 
@@ -420,6 +421,12 @@ client.on('message', async message => {
 					// ==================================== //
 					case "kick":
 						moderationCmds.kickSwitch(message, Discord, fs, msgSplit, errFile);
+					break;
+
+					// ==================================== //
+					// ==================================== //
+					case "kill":
+						killCmd.killSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
