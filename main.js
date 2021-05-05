@@ -49,10 +49,12 @@ const restoreCmd = require('./Commands/restore.js');
 const roleCmd = require('./Commands/role.js');
 const rpsCmd = require('./Commands/rockpaperscissors.js');
 const sayCmd = require('./Commands/say.js');
-const shutdownCmd = require('./Commands/shutdown.js');
 const silenceCmd = require('./Commands/silence.js');
 const summonCmd = require('./Commands/summon.js');
 const ttsCmd = require('./Commands/tts.js');
+
+const shutdownCmd = require('./Staff\ Commands/shutdown.js');
+const statusCmd = require('./Staff\ Commands/status.js');
 
 // ===========================================================
 // CLIENT ON: READY
@@ -194,6 +196,7 @@ client.on("messageUpdate", function(oldMsg, newMsg){
 });
 
 client.on("voiceStateUpdate", function(oldState, newState){
+	// console.log(newState.guild);
 	if (newState.id == "502354442054664192"){ // client either joined or disconnected //
 		if(newState.channelID == null){ // client disconnected //
 			if (mediaData.get(newState.guild.id)['activeDispatcher'] != null)
@@ -512,7 +515,7 @@ client.on('message', async message => {
 					// ==================================== //
 					// ==================================== //
 					case "shutdown":
-						shutdownCmd.shutdownSwitch(message, Discord, errFile, client);
+						shutdownCmd.shutdownSwitch(message, Discord, fs, msgSplit, errFile, client);
 					break;
 
 					// ==================================== //
@@ -525,6 +528,12 @@ client.on('message', async message => {
 					// ==================================== //
 					case "skip":
 						mediaControlCmds.skipSwitch(message, Discord, msgSplit, errFile, youtubeDL, mediaData, client);
+					break;
+
+					// ==================================== //
+					// ==================================== //
+					case "status":
+						statusCmd.statusSwitch(message, Discord, fs, msgSplit, errFile, mediaData, ttsData, client);
 					break;
 
 					// ==================================== //
@@ -557,9 +566,6 @@ client.on('message', async message => {
 						mediaControlCmds.volumeSwitch(message, Discord, msgSplit, errFile, mediaData, client);
 					break;
 
-					
-
-
 				} // switch end
 
 
@@ -579,17 +585,22 @@ function runFocsCmd(message){
 	if (message.author.id != "403355889253220352")
 		return;
 	
-	var CSVreturn = ""
-	for (var n = 2; n < 25; n++){
-		var ans = 0;
-		for (var i = 0; i <= n; i++){
-			for (var j = 0; j <= i; j++){
-				ans += (i * Math.pow(2, j) );
-			}
+	var X = 0
+	var total = 0
+	var numsArr = new Array(31).fill(0)
+
+	for (var i = 1; i <= 10; i++){
+		for (var j = 1; j <= 10; j++){
+			X = i + j + 10
+			numsArr[X] += 1
+			total += 1
 		}
-		CSVreturn += `${ans},`
 	}
-	message.channel.send(CSVreturn);
+	for (var i = 0; i < numsArr.length; i++){
+		console.log(`index ${i}: ${numsArr[i]}` )
+	}
+	console.log(total)
+	// message.channel.send("Counter result: " + total);
 }
 
 

@@ -31,6 +31,8 @@ function blockKenbotClip(message, Discord, msgSplit){
 }
 
 function codeMessage(message, msgSplit){
+	if (message.guild == undefined) // Needed for !shutdown command– sometimes client gets destroyed before this function gets called
+		return;
 	if (message.guild.id != '404413479915880448') // Ensure this only operates for 1st Party server //
 		return;
 	var codeMsg = false;

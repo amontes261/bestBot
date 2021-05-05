@@ -93,6 +93,7 @@ async function clipSwitch(message, Discord, fs, msgSplit, errFile, mediaData, cl
                 allClips = serverClips.filter(file => file[0] != "."); // Removes iCloud Drive .DS_Store file //
             }
 
+            embeddedMsg = new Discord.MessageEmbed()
             if (!serverFileExists || allClips.length == 0){
                 embeddedMsg.setColor('C80000'); // red
                 embeddedMsg.setTitle(`Clip List Unavailable`);

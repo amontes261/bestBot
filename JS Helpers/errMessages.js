@@ -574,6 +574,21 @@ function silence(message, Discord){
     message.channel.send(embeddedMsg);
 }
 
+function status(message, Discord){
+    const embeddedMsg = new Discord.MessageEmbed();
+    embeddedMsg.setColor('C80000') // red
+    embeddedMsg.setTitle('**!stop Command Usage:**');
+
+    embeddedMsg.addFields(
+        { name: "**Get the bestBot client status:**", value: '!status' }
+    )
+
+    embeddedMsg.setTimestamp()
+    embeddedMsg.setFooter(`Command usage summoned by ${message.guild.members.cache.get(message.author.id).displayName}`);
+
+    message.channel.send(embeddedMsg);
+}
+
 function stop(message, Discord){
     const embeddedMsg = new Discord.MessageEmbed();
     embeddedMsg.setColor('C80000') // red

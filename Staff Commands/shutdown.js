@@ -4,7 +4,7 @@
 //// Alex Montes  –––––  @a.montes28#4501 ////
 //////////////////////////////////////////////
 
-async function shutdownSwitch(message, Discord, errFile, client){
+async function shutdownSwitch(message, Discord, fs, msgSplit, errFile, client){
     
 /* - Asynchronous function shutdownSwitch() was designed to ONLY be called from file main.js
 
@@ -12,10 +12,22 @@ async function shutdownSwitch(message, Discord, errFile, client){
 
     - Was designed to be triggered via command: !shutdown
 
-    - Only Alex can use the command */
+    - Only Master Users can use this command */
 
-    if (message.author.id != "403355889253220352"){
-        errFile.permissionDenied(message, Discord, 'shutdown');
+    var data;
+    try{ // Attempt to read "database" JSON file //
+        data = JSON.parse(fs.readFileSync("Data_Management/authorization.json"));
+    }
+    catch (e){
+        errFile.unexpectedErr(message, Discord, msgSplit, "shutdown", client);
+        return;
+    }
+
+    var isMaster = data["Master"].hasOwnProperty(message.author.id);
+
+    if (!isMaster){ // Ensure user has proper permission to use this command //
+        errFile.permissionDenied(message, Discord, "shutdown");
+        return;
     }
     else{
         const reply = new Discord.MessageEmbed()
